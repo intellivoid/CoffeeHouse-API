@@ -3,6 +3,7 @@
 
     use CoffeeHouse\Bots\Cleverbot;
     use CoffeeHouse\CoffeeHouse;
+    use CoffeeHouse\Exceptions\BotSessionException;
     use ModularAPI\Abstracts\HTTP\ContentType;
     use ModularAPI\Abstracts\HTTP\FileType;
     use ModularAPI\Abstracts\HTTP\ResponseCode\ClientError;
@@ -20,7 +21,7 @@
     {
         switch($Parameters['client_key'])
         {
-            case 'SuperSecret123': break;
+            case 'KIK_PROJECT_SYNICAL_AI-CODE(F43FN384DM92D3M2)': break;
             default:
                 $Response = new Response();
                 $Response->ResponseCode = ClientError::_401;
@@ -39,7 +40,7 @@
             $CleverBot = new Cleverbot($CoffeeHouse);
             $CleverBot->newSession('en');
         }
-        catch(\CoffeeHouse\Exceptions\BotSessionException $botSessionException)
+        catch(BotSessionException $botSessionException)
         {
             $Response = new Response();
             $Response->ResponseCode = ClientError::_404;
