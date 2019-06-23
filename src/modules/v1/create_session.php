@@ -33,9 +33,24 @@
                 return $Response;
         }
 
-        $CoffeeHouse = new CoffeeHouse();
-        $CleverBot = new Cleverbot($CoffeeHouse);
-        $CleverBot->newSession('en');
+        try
+        {
+            $CoffeeHouse = new CoffeeHouse();
+            $CleverBot = new Cleverbot($CoffeeHouse);
+            $CleverBot->newSession('en');
+        }
+        catch(\CoffeeHouse\Exceptions\BotSessionException $botSessionException)
+        {
+            $Response = new Response();
+            $Response->ResponseCode = ClientError::_404;
+            $Response->ResponseType = ContentType::application . '/' . FileType::json;
+            $Response->Content = array(
+                'status' => false,
+                'code' => ClientError::_404,
+                'message' => 'Session cannot be created, service unavailable'
+            );
+            return $Response;
+        }
 
         $Response = new Response();
         $Response->ResponseCode = Successful::_200;
