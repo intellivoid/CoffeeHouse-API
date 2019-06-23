@@ -1,0 +1,39 @@
+{
+    "v1": {
+      "API": {
+        "AVAILABLE": true,
+        "UNAVAILABLE_MESSAGE": "The API is unavailable at the moment"
+      },
+      "POLICY": {
+        "AUTHENTICATION_REQUIRED": false,
+        "FORCE_CERTIFICATE": false
+      },
+      "MODULES":
+      {
+        "CreateSession": {
+          "REQUIRE_AUTHENTICATION": false,
+          "REQUIRE_USAGE": false,
+          "POST_METHOD_ALLOWED": true,
+          "GET_METHOD_ALLOWED": true,
+          "SCRIPT": "create_session",
+          "PARAMETERS":
+          {
+            "client_key": {"REQUIRED": true, "DEFAULT":  null}
+          }
+        },
+        "ThinkThought": {
+          "REQUIRE_AUTHENTICATION": false,
+          "REQUIRE_USAGE": false,
+          "POST_METHOD_ALLOWED": true,
+          "GET_METHOD_ALLOWED": true,
+          "SCRIPT": "think_thought",
+          "PARAMETERS":
+          {
+            "client_key": {"REQUIRED": true, "DEFAULT":  null},
+            "session_id": {"REQUIRED": true, "DEFAULT":  null},
+            "input": {"REQUIRED": true, "DEFAULT": null}
+          }
+        }
+      }
+    }
+}
