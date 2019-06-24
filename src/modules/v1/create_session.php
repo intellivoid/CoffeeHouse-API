@@ -22,6 +22,7 @@
         switch($Parameters['client_key'])
         {
             case 'KIK_PROJECT_SYNICAL_AI-CODE(F43FN384DM92D3M2)': break;
+            case 'TELEGRAM_PROJECT_SYNICAL_AI-CODE(928DJN932ND928D)': break;
             default:
                 $Response = new Response();
                 $Response->ResponseCode = ClientError::_401;

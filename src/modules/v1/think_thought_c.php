@@ -38,49 +38,57 @@
 
         $CoffeeHouse = new CoffeeHouse();
         $CleverBot = new Cleverbot($CoffeeHouse);
+        $TelegramClient = $CoffeeHouse->getTelegramClientManager()->syncClient($Parameters['user_id']);
 
-        try
+        if($TelegramClient->ForeignSessionID == 'None')
         {
-            $CleverBot->loadSession($Parameters['session_id']);
+
+            try
+            {
+                $CleverBot->newSession('en');
+            }
+            catch(BotSessionException $botSessionException)
+            {
+                $Response = new Response();
+                $Response->ResponseCode = ClientError::_404;
+                $Response->ResponseType = ContentType::application . '/' . FileType::json;
+                $Response->Content = array(
+                    'status' => false,
+                    'code' => ClientError::_404,
+                    'message' => 'Session cannot be created, service unavailable'
+                );
+                return $Response;
+            }
+
+            $TelegramClient->ForeignSessionID = $CleverBot->getSession()->SessionID;
+            $CoffeeHouse->getTelegramClientManager()->updateClient($TelegramClient);
         }
-        catch(ForeignSessionNotFoundException $foreignSessionNotFoundException)
+        else
         {
-            $Response = new Response();
-            $Response->ResponseCode = ClientError::_404;
-            $Response->ResponseType = ContentType::application . '/' . FileType::json;
-            $Response->Content = array(
-                'status' => false,
-                'code' => ClientError::_404,
-                'message' => 'Session not found'
-            );
-            return $Response;
-        }
+            try
+            {
+                $CleverBot->loadSession($TelegramClient->ForeignSessionID);
+            }
+            catch(ForeignSessionNotFoundException $foreignSessionNotFoundException)
+            {
+                $CleverBot->newSession('en');
+                $TelegramClient->ForeignSessionID = $CleverBot->getSession()->SessionID;
+                $CoffeeHouse->getTelegramClientManager()->updateClient($TelegramClient);
+            }
 
+            if(time() > $CleverBot->getSession()->Expires)
+            {
+                $CleverBot->newSession('en');
+                $TelegramClient->ForeignSessionID = $CleverBot->getSession()->SessionID;
+                $CoffeeHouse->getTelegramClientManager()->updateClient($TelegramClient);
+            }
 
-        if(time() > $CleverBot->getSession()->Expires)
-        {
-            $Response = new Response();
-            $Response->ResponseCode = ClientError::_400;
-            $Response->ResponseType = ContentType::application . '/' . FileType::json;
-            $Response->Content = array(
-                'status' => false,
-                'code' => ClientError::_400,
-                'message' => 'Session Expired'
-            );
-            return $Response;
-        }
-
-        if($CleverBot->getSession()->Available == false)
-        {
-            $Response = new Response();
-            $Response->ResponseCode = ClientError::_400;
-            $Response->ResponseType = ContentType::application . '/' . FileType::json;
-            $Response->Content = array(
-                'status' => false,
-                'code' => ClientError::_400,
-                'message' => 'Session Not Available'
-            );
-            return $Response;
+            if($CleverBot->getSession()->Available == false)
+            {
+                $CleverBot->newSession('en');
+                $TelegramClient->ForeignSessionID = $CleverBot->getSession()->SessionID;
+                $CoffeeHouse->getTelegramClientManager()->updateClient($TelegramClient);
+            }
         }
 
         try

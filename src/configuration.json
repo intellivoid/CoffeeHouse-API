@@ -21,6 +21,19 @@
             "client_key": {"REQUIRED": true, "DEFAULT":  null}
           }
         },
+        "ThinkTelegramThought": {
+          "REQUIRE_AUTHENTICATION": false,
+          "REQUIRE_USAGE": false,
+          "POST_METHOD_ALLOWED": true,
+          "GET_METHOD_ALLOWED": true,
+          "SCRIPT": "think_thought_c",
+          "PARAMETERS":
+          {
+            "client_key": {"REQUIRED": true, "DEFAULT":  null},
+            "user_id": {"REQUIRED": true, "DEFAULT": null},
+            "input": {"REQUIRED":  true, "DEFAULT":  null}
+          }
+        },
         "ThinkThought": {
           "REQUIRE_AUTHENTICATION": false,
           "REQUIRE_USAGE": false,
