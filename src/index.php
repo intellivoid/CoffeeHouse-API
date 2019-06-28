@@ -151,7 +151,11 @@
     try
     {
         $Parameters = Request::getParameters($Module->Parameters);
-        $Response = checkPlan($AccessKey);
+        $Response = null;
+        if($SafeVersion !== 'v2')
+        {
+            $Response = checkPlan($AccessKey);
+        }
         if($Response == null)
         {
             /** @noinspection PhpIncludeInspection */
