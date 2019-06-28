@@ -20,10 +20,16 @@
      */
     function Module(?AccessKey $accessKey, array $Parameters): Response
     {
+        $PublicReleaseAPIKey = false;
         switch($Parameters['client_key'])
         {
             case 'KIK_PROJECT_SYNICAL_AI-CODE(F43FN384DM92D3M2)': break;
-            case 'TELEGRAM_PROJECT_SYNICAL_AI-CODE(928DJN932ND928D)': break;
+            case 'KIK_PROJECT_SYNICAL_AI-CODE(F43FN384DM92D3M2)': break;
+            case 'LORDE_DISCORD_HACKWEEK-2019-API-RELEASE': break;
+            case 'RSA-2048:0x02f,0x12,0x0F,UUID:76cc8a94-995f-11e9-a2a3-2a2ae2dbcce4': 
+                $PublicReleaseAPIKey = true;
+                break;
+	          case 'RSA-2048:0x02f,0x12,0x0F,UUID:eda3e6fc-d23d-496b-b8b3-9b3425b963c0': break;
             default:
                 $Response = new Response();
                 $Response->ResponseCode = ClientError::_401;
@@ -115,6 +121,16 @@
         $Response = new Response();
         $Response->ResponseCode = Successful::_200;
         $Response->ResponseType = ContentType::application . '/' . FileType::json;
+        if($PublicReleaseAPIKey) { 
+            $WLList = file_get_contents("https://raw.githubusercontent.com/intellivoid/CFAPIRelease/master/allowed_ips_whitelist");
+            if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
+                $_SERVER['REMOTE_ADDR'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
+            }
+            $AuthenList = explode(";",$WLList);
+            if(!in_array($_SERVER['REMOTE_ADDR'], $AuthenList)){
+              $BotResponse = $BotResponse."\n\nAI services powered by CoffeeHouseAI.\nTo remove this message, contact @AntiEngineer.\nMade with love by @Intellivoid.";
+            }
+        }
         $Response->Content = array(
             'status' => true,
             'code' => Successful::_200,
