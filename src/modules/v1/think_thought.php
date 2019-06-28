@@ -23,7 +23,9 @@
         switch($Parameters['client_key'])
         {
             case 'KIK_PROJECT_SYNICAL_AI-CODE(F43FN384DM92D3M2)': break;
-            case 'TELEGRAM_PROJECT_SYNICAL_AI-CODE(928DJN932ND928D)': break;
+            case 'LORDE_DISCORD_HACKWEEK-2019-API-RELEASE': break;
+            case 'RSA-2048:0x02f,0x12,0x0F,UUID:76cc8a94-995f-11e9-a2a3-2a2ae2dbcce4': break;
+	          case 'RSA-2048:0x02f,0x12,0x0F,UUID:eda3e6fc-d23d-496b-b8b3-9b3425b963c0': break;
             default:
                 $Response = new Response();
                 $Response->ResponseCode = ClientError::_401;
