@@ -7,7 +7,8 @@
     use ModularAPI\Abstracts\HTTP\ContentType;
     use ModularAPI\Abstracts\HTTP\FileType;
     use ModularAPI\Abstracts\HTTP\ResponseCode\ClientError;
-    use ModularAPI\Abstracts\HTTP\ResponseCode\Successful;
+use ModularAPI\Abstracts\HTTP\ResponseCode\ServerError;
+use ModularAPI\Abstracts\HTTP\ResponseCode\Successful;
     use ModularAPI\Objects\AccessKey;
     use ModularAPI\Objects\Response;
 
@@ -229,11 +230,11 @@
         catch(BotSessionException $botSessionException)
         {
             $Response = new Response();
-            $Response->ResponseCode = ClientError::_404;
+            $Response->ResponseCode = ServerError::_503;
             $Response->ResponseType = ContentType::application . '/' . FileType::json;
             $Response->Content = array(
                 'status' => false,
-                'code' => ClientError::_404,
+                'code' => ServerError::_503,
                 'message' => 'Session cannot be created, service unavailable'
             );
             return $Response;
