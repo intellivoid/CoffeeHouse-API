@@ -152,7 +152,7 @@
     {
         $Parameters = Request::getParameters($Module->Parameters);
         $Response = null;
-        if($SafeVersion !== 'v2')
+        if($SafeVersion == 'v2')
         {
             $Response = checkPlan($AccessKey);
         }
