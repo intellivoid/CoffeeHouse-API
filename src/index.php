@@ -23,7 +23,9 @@
 
     include_once(__DIR__ . DIRECTORY_SEPARATOR . 'ModularAPI' . DIRECTORY_SEPARATOR . 'ModularAPI.php');
     include_once(__DIR__ . DIRECTORY_SEPARATOR . 'CoffeeHouse' . DIRECTORY_SEPARATOR . 'CoffeeHouse.php');
+    include_once(__DIR__ . DIRECTORY_SEPARATOR . 'IntellivoidAccounts' . DIRECTORY_SEPARATOR . 'IntellivoidAccounts.php');
     include_once(__DIR__ . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . 'authentication.php');
+    include_once(__DIR__ . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . 'check_plan.php');
     include_once(__DIR__ . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . 'generic_responses.php');
     include_once(__DIR__ . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . 'request.php');
 
@@ -149,10 +151,16 @@
     try
     {
         $Parameters = Request::getParameters($Module->Parameters);
-        /** @noinspection PhpIncludeInspection */
-        include($ModuleFile);
-        $Response = Module($AccessKey, $Parameters);
+        $Response = checkPlan($AccessKey);
+        if($Response == null)
+        {
+            /** @noinspection PhpIncludeInspection */
+            include($ModuleFile);
+            $Response = Module($AccessKey, $Parameters);
+            $ExecutionEnd = microtime(true);
+        }
         $ExecutionEnd = microtime(true);
+
     }
     catch(MissingParameterException $missingParameterException)
     {
