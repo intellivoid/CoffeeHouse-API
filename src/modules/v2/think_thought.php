@@ -8,7 +8,8 @@
     use ModularAPI\Abstracts\HTTP\ContentType;
     use ModularAPI\Abstracts\HTTP\FileType;
     use ModularAPI\Abstracts\HTTP\ResponseCode\ClientError;
-    use ModularAPI\Abstracts\HTTP\ResponseCode\Successful;
+use ModularAPI\Abstracts\HTTP\ResponseCode\ServerError;
+use ModularAPI\Abstracts\HTTP\ResponseCode\Successful;
     use ModularAPI\Objects\AccessKey;
     use ModularAPI\Objects\Response;
 
@@ -20,21 +21,6 @@
      */
     function Module(?AccessKey $accessKey, array $Parameters): Response
     {
-        switch($Parameters['client_key'])
-        {
-            case 'KIK_PROJECT_SYNICAL_AI-CODE(F43FN384DM92D3M2)': break;
-            case 'TELEGRAM_PROJECT_SYNICAL_AI-CODE(928DJN932ND928D)': break;
-            default:
-                $Response = new Response();
-                $Response->ResponseCode = ClientError::_401;
-                $Response->ResponseType = ContentType::application . '/' . FileType::json;
-                $Response->Content = array(
-                    'status' => false,
-                    'code' => ClientError::_401,
-                    'message' => 'Invalid Client Key'
-                );
-                return $Response;
-        }
 
         $CoffeeHouse = new CoffeeHouse();
         $CleverBot = new Cleverbot($CoffeeHouse);
@@ -51,11 +37,10 @@
             $Response->Content = array(
                 'status' => false,
                 'code' => ClientError::_404,
-                'message' => 'Session not found'
+                'message' => 'The session ID does not exist'
             );
             return $Response;
         }
-
 
         if(time() > $CleverBot->getSession()->Expires)
         {
@@ -65,7 +50,7 @@
             $Response->Content = array(
                 'status' => false,
                 'code' => ClientError::_400,
-                'message' => 'Session Expired'
+                'message' => 'Session expired'
             );
             return $Response;
         }
@@ -73,12 +58,25 @@
         if($CleverBot->getSession()->Available == false)
         {
             $Response = new Response();
+            $Response->ResponseCode = ServerError::_503;
+            $Response->ResponseType = ContentType::application . '/' . FileType::json;
+            $Response->Content = array(
+                'status' => false,
+                'code' => ServerError::_503,
+                'message' => 'Session no longer available'
+            );
+            return $Response;
+        }
+
+        if(strlen($Parameters['input']) < 1)
+        {
+            $Response = new Response();
             $Response->ResponseCode = ClientError::_400;
             $Response->ResponseType = ContentType::application . '/' . FileType::json;
             $Response->Content = array(
                 'status' => false,
                 'code' => ClientError::_400,
-                'message' => 'Session Not Available'
+                'message' => 'Input cannot be empty'
             );
             return $Response;
         }
@@ -94,12 +92,12 @@
             $CoffeeHouse->getForeignSessionsManager()->updateSession($Session);
 
             $Response = new Response();
-            $Response->ResponseCode = ClientError::_400;
+            $Response->ResponseCode = ServerError::_503;
             $Response->ResponseType = ContentType::application . '/' . FileType::json;
             $Response->Content = array(
                 'status' => false,
-                'code' => ClientError::_400,
-                'message' => 'Session Not Available'
+                'code' => ServerError::_503,
+                'message' => 'Session no longer available'
             );
             return $Response;
         }
@@ -111,8 +109,6 @@
             'status' => true,
             'code' => Successful::_200,
             'payload' => array(
-                'session_id' => $CleverBot->getSession()->SessionID,
-                'expires' => $CleverBot->getSession()->Expires,
                 'output' => $BotResponse
             )
         );

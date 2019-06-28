@@ -71,15 +71,25 @@
           "language": {"REQUIRED": false, "DEFAULT":  "en"}
         }
       },
+      "GetSession": {
+        "REQUIRE_AUTHENTICATION": true,
+        "REQUIRE_USAGE": true,
+        "POST_METHOD_ALLOWED": true,
+        "GET_METHOD_ALLOWED": true,
+        "SCRIPT": "get_session",
+        "PARAMETERS":
+        {
+          "session_id": {"REQUIRED": true, "DEFAULT":  null}
+        }
+      },
       "ThinkThought": {
-        "REQUIRE_AUTHENTICATION": false,
-        "REQUIRE_USAGE": false,
+        "REQUIRE_AUTHENTICATION": true,
+        "REQUIRE_USAGE": true,
         "POST_METHOD_ALLOWED": true,
         "GET_METHOD_ALLOWED": true,
         "SCRIPT": "think_thought",
         "PARAMETERS":
         {
-          "client_key": {"REQUIRED": true, "DEFAULT":  null},
           "session_id": {"REQUIRED": true, "DEFAULT":  null},
           "input": {"REQUIRED": true, "DEFAULT": null}
         }
