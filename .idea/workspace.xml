@@ -2,82 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9aeeef86-4b4b-4eff-b59f-1dc339be905c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Abstracts/AccountStatus.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Abstracts/ExceptionCodes.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Abstracts/LoginStatus.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Abstracts/OpenBluPlan.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Abstracts/OperatorType.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Abstracts/SearchMethods/AccountSearchMethod.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Abstracts/SearchMethods/TransactionRecordSearchMethod.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Abstracts/TransactionType.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/AutoConfig.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/BasicCalculator/BC.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/BasicCalculator/basic_calculator.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/AccountLimitedException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/AccountNotFoundException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/AccountSuspendedException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/ConfigurationNotFoundException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/DatabaseException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/EmailAlreadyExistsException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/IncorrectLoginDetailsException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/InsufficientFundsException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/InvalidAccountStatusException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/InvalidEmailException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/InvalidIpException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/InvalidLoginStatusException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/InvalidPasswordException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/InvalidSearchMethodException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/InvalidTransactionTypeException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/InvalidUsernameException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/InvalidVendorException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/TransactionRecordNotFoundException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Exceptions/UsernameAlreadyExistsException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/IntellivoidAccounts.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Managers/AccountManager.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Managers/LoginRecordManager.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Managers/TransactionRecordManager.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Objects/Account.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Objects/Account/Configuration.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Objects/Account/Configuration/OpenBlu.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Objects/Account/PersonalInformation.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Objects/Account/PersonalInformation/BirthDate.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Objects/ApplicationConfiguration.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Objects/LoginRecord.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Objects/TransactionRecord.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Utilities/Hashing.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/Utilities/Validate.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/Abstracts/Options.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/Abstracts/Regex.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/BufferStream.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/DecodingOptions.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/EncodingOptions.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/Exception/DecodingFailedException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/Exception/EncodingFailedException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/Exception/InsufficientDataException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/Exception/IntegerOverflowException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/Exception/InvalidOptionException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/Ext.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/Packet.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/Type/Binary.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/Type/Map.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/TypeTransformer/BinaryTransformer.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/TypeTransformer/Extension.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/TypeTransformer/MapTransformer.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/TypeTransformer/Validator.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/ZiProto.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/ZiProto/ziproto.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/acm/Abstracts/ExceptionCodes.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/acm/CommandLine.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/acm/Exceptions/LocalConfigurationException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/acm/Exceptions/NoConfigurationFoundException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/acm/Objects/Schema.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/acm/acm.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/acm/acm.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/configuration.ini" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/IntellivoidAccounts/intellivoid_accounts.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/api/check_plan.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -86,29 +12,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/api/check_plan.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
-              <caret line="51" column="34" lean-forward="true" selection-start-line="51" selection-start-column="34" selection-end-line="51" selection-end-column="34" />
-              <folding>
-                <element signature="e#7#50#0#PHP" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/index.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="744">
-              <caret line="160" column="9" lean-forward="true" selection-start-line="160" selection-start-column="9" selection-end-line="160" selection-end-column="9" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -127,11 +31,13 @@
         <option value="$PROJECT_DIR$/src/configuration.json" />
         <option value="$PROJECT_DIR$/src/modules/v2/think_thought.php" />
         <option value="$PROJECT_DIR$/src/modules/v2/create_session.php" />
-        <option value="$PROJECT_DIR$/src/index.php" />
         <option value="$PROJECT_DIR$/src/api/check_plan.php" />
+        <option value="$PROJECT_DIR$/src/index.php" />
+        <option value="$PROJECT_DIR$/src/ModularAPI/Objects/Response.php" />
       </list>
     </option>
   </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP" />
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="315" />
     <option name="y" value="36" />
@@ -184,10 +90,10 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../CoffeeHouse-Web" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="reference.webide.settings.project.settings.php" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -219,16 +125,15 @@
       <option name="presentableId" value="Default" />
       <updated>1561696845078</updated>
       <workItem from="1561696846653" duration="6305000" />
-      <workItem from="1561734124022" duration="1302000" />
+      <workItem from="1561734124022" duration="1708000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7607000" />
+    <option name="totallyTimeSpent" value="8013000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="754" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25340393" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -320,20 +225,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/api/check_plan.php">
+    <entry file="file://$PROJECT_DIR$/src/ModularAPI/HTTP/Response.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="51" column="34" lean-forward="true" selection-start-line="51" selection-start-column="34" selection-end-line="51" selection-end-column="34" />
-          <folding>
-            <element signature="e#7#50#0#PHP" expanded="true" />
-          </folding>
+        <state relative-caret-position="-1097">
+          <caret line="27" column="31" selection-start-line="27" selection-start-column="31" selection-end-line="27" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ModularAPI/Objects/Response.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="178">
+          <caret line="39" column="47" selection-start-line="39" selection-start-column="47" selection-end-line="39" selection-end-column="47" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/index.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="744">
-          <caret line="160" column="9" lean-forward="true" selection-start-line="160" selection-start-column="9" selection-end-line="160" selection-end-column="9" />
+        <state relative-caret-position="391">
+          <caret line="200" column="23" selection-start-line="200" selection-start-column="23" selection-end-line="200" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/api/check_plan.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="57" column="9" selection-start-line="45" selection-start-column="8" selection-end-line="57" selection-end-column="9" />
+          <folding>
+            <element signature="e#7#50#0#PHP" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
