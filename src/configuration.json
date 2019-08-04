@@ -1,8 +1,8 @@
 {
     "v1": {
       "API": {
-        "AVAILABLE": true,
-        "UNAVAILABLE_MESSAGE": "The API is unavailable at the moment"
+        "AVAILABLE": false,
+        "UNAVAILABLE_MESSAGE": "v1 is no longer supported, please use v2 instead."
       },
       "POLICY": {
         "AUTHENTICATION_REQUIRED": false,
