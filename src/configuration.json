@@ -2,7 +2,7 @@
     "v1": {
       "API": {
         "AVAILABLE": false,
-        "UNAVAILABLE_MESSAGE": "v1 is no longer supported, please use v2 instead."
+        "UNAVAILABLE_MESSAGE": "v1 is no longer supported, please use v2 instead!"
       },
       "POLICY": {
         "AUTHENTICATION_REQUIRED": false,
