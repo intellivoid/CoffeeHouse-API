@@ -1,5 +1,34 @@
+/*
+ * 
+ * PKI Configuration
+ *
+ * This file contains critical configuration used to provision a production 
+ * environment, security checks and unit-testing protocols.
+ *
+ * 2019 (C) Intellivoid Technologies
+ * 
+ * PKI Version: v1.2.1
+ * 
+ */
+
 {
+  "project": {
+    "name": "CoffeeHouse-API",
+    "scope": "public"
+  },
+  "storage": {
+    "production_path": "html_backend/api-public/coffeehouse/",
+    "permissions": 0777
+  },
+  "ci": {
+    "linting": {
+      "enabled": true,
+      "language": "php"
+    }, 
     "unit-testing": {
-        "enabled": false
+      "enabled": false,
+      "path": "tests/",
+      "tests": ["test"]
     }
+  }
 }
