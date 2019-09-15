@@ -16,7 +16,7 @@
     use ModularAPI\Exceptions\MissingParameterException;
     use ModularAPI\Exceptions\UsageExceededException;
     use ModularAPI\HTTP\Request;
-    use ModularAPI\ModularAPI
+    use ModularAPI\ModularAPI;
     use ModularAPI\Objects\AccessKey;
     use ModularAPI\Objects\ExceptionDetails;
     use ModularAPI\Objects\Response;
