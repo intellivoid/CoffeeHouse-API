@@ -46,6 +46,11 @@
             return $Response;
         }
 
+        if((int)time() > $ForeignSession->Expires)
+        {
+            $ForeignSession->Available = false;
+        }
+
         $Response = new Response();
         $Response->ResponseCode = Successful::_200;
         $Response->ResponseType = ContentType::application . '/' . FileType::json;
