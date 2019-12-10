@@ -18,7 +18,7 @@
   },
   "storage": {
     "production_path": "html_backend/api-public/coffeehouse/",
-    "permissions": 0777
+    "permissions": 777
   },
   "ci": {
     "linting": {
