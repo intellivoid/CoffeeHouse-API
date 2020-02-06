@@ -18,6 +18,13 @@
 					"MAIN_CLASS": "IntellivoidAPI",
 					"CHECK_EXISTS": true
 				},
+				"IntellivoidSubscriptionManager": {
+					"DIRECTORY_NAME": "IntellivoidSubscriptionManager",
+					"AUTOLOADER": "IntellivoidSubscriptionManager.php",
+					"NAMESPACE": "IntellivoidSubscriptionManager",
+					"MAIN_CLASS": "IntellivoidSubscriptionManager",
+					"CHECK_EXISTS": true
+				},
 				"COASniffle": {
 					"DIRECTORY_NAME": "COASniffle",
 					"AUTOLOADER": "COASniffle.php",
