@@ -17,6 +17,13 @@
 					"NAMESPACE": "IntellivoidAPI",
 					"MAIN_CLASS": "IntellivoidAPI",
 					"CHECK_EXISTS": true
+				},
+				"COASniffle": {
+					"DIRECTORY_NAME": "COASniffle",
+					"AUTOLOADER": "COASniffle.php",
+					"NAMESPACE": "COASniffle",
+					"MAIN_CLASS": "COASniffle",
+					"CHECK_EXISTS": true
 				}
 			},
 			"MODULES": [
