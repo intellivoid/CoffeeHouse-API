@@ -1,0 +1,62 @@
+{
+	"NAME": "CoffeeHouse API",
+	"DOCUMENTATION_URL": "https://example.com/",
+	"BASE_PATH": "/coffeehouse",
+	"AVAILABLE": true,
+	"UNAVAILABLE_MESSAGE": "This API service is not available right now",
+	"DEBUG_EXCEPTIONS": false,
+	"VERSION_CONFIGURATIONS": [
+		{
+			"VERSION": "v1",
+			"AVAILABLE": true,
+			"UNAVAILABLE_MESSAGE": "This version is not available at the moment, please check back later",
+			"LIBRARIES": {
+				"IntellivoidAPI": {
+					"DIRECTORY_NAME": "IntellivoidAPI",
+					"AUTOLOADER": "IntellivoidAPI.php",
+					"NAMESPACE": "IntellivoidAPI",
+					"MAIN_CLASS": "IntellivoidAPI",
+					"CHECK_EXISTS": true
+				},
+				"IntellivoidSubscriptionManager": {
+					"DIRECTORY_NAME": "IntellivoidSubscriptionManager",
+					"AUTOLOADER": "IntellivoidSubscriptionManager.php",
+					"NAMESPACE": "IntellivoidSubscriptionManager",
+					"MAIN_CLASS": "IntellivoidSubscriptionManager",
+					"CHECK_EXISTS": true
+				},
+				"CoffeeHouse": {
+					"DIRECTORY_NAME": "CoffeeHouse",
+					"AUTOLOADER": "CoffeeHouse.php",
+					"NAMESPACE": "CoffeeHouse",
+					"MAIN_CLASS": "CoffeeHouse",
+					"CHECK_EXISTS": true
+				},
+				"COASniffle": {
+					"DIRECTORY_NAME": "COASniffle",
+					"AUTOLOADER": "COASniffle.php",
+					"NAMESPACE": "COASniffle",
+					"MAIN_CLASS": "COASniffle",
+					"CHECK_EXISTS": true
+				}
+			},
+			"MODULES": [
+				{
+					"script": "create_lydia_session", "path": "lydia/session/get",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
+				},
+				{
+					"script": "get_lydia_session", "path": "lydia/session/create",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
+				},
+				{
+					"script": "lydia_think_thought", "path": "lydia/session/think",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
+				}
+			]
+		}
+	]
+}

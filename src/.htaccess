@@ -1,8 +1,9 @@
-Options +FollowSymLinks -MultiViews
-Options -Indexes
-RewriteEngine on
+RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)/(.*)$ index.php?version=$1&module=$2 [L,QSA]
-RewriteRule /?configuration.json$ - [F,L]
-ErrorDocument 404 /index.php
+RewriteRule . index.php [L]
+Options -Indexes
+
+<Files .htaccess>
+    Order allow,deny
+    Deny from all
+</Files>
