@@ -25,6 +25,13 @@
 					"MAIN_CLASS": "IntellivoidSubscriptionManager",
 					"CHECK_EXISTS": true
 				},
+				"CoffeeHouse": {
+					"DIRECTORY_NAME": "CoffeeHouse",
+					"AUTOLOADER": "CoffeeHouse.php",
+					"NAMESPACE": "CoffeeHouse",
+					"MAIN_CLASS": "CoffeeHouse",
+					"CHECK_EXISTS": true
+				},
 				"COASniffle": {
 					"DIRECTORY_NAME": "COASniffle",
 					"AUTOLOADER": "COASniffle.php",
