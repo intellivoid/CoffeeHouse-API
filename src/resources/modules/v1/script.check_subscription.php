@@ -2,18 +2,22 @@
 
     use COASniffle\Exceptions\CoaAuthenticationException;
     use COASniffle\Handlers\COA;
+    use CoffeeHouse\Abstracts\UserSubscriptionSearchMethod;
+    use CoffeeHouse\CoffeeHouse;
+    use CoffeeHouse\Exceptions\UserSubscriptionNotFoundException;
+    use CoffeeHouse\Objects\UserSubscription;
     use Handler\GenericResponses\InternalServerError;
     use Handler\Handler;
+    use IntellivoidAPI\Exceptions\AccessRecordNotFoundException;
+    use IntellivoidAPI\Exceptions\InvalidRateLimitConfiguration;
     use IntellivoidAPI\Objects\AccessRecord;
     use IntellivoidSubscriptionManager\Abstracts\SearchMethods\SubscriptionSearchMethod;
+    use IntellivoidSubscriptionManager\Exceptions\DatabaseException;
+    use IntellivoidSubscriptionManager\Exceptions\InvalidSearchMethodException;
     use IntellivoidSubscriptionManager\Exceptions\SubscriptionNotFoundException;
     use IntellivoidSubscriptionManager\IntellivoidSubscriptionManager;
     use IntellivoidSubscriptionManager\Objects\Subscription;
     use IntellivoidSubscriptionManager\Utilities\Converter;
-    use OpenBlu\Abstracts\SearchMethods\UserSubscriptionSearchMethod;
-    use OpenBlu\Exceptions\UserSubscriptionRecordNotFoundException;
-    use OpenBlu\Objects\UserSubscription;
-    use OpenBlu\OpenBlu;
 
     /**
      * This script gets executed by the main modules to determine if the subscription
@@ -41,20 +45,26 @@
         /**
          * Processes the access key and determines if it used against a valid subscription.
          *
-         * @param OpenBlu $openBlu
+         * @param CoffeeHouse $coffeeHouse
          * @param AccessRecord $accessRecord
          * @return null|array
-         * @throws Exception
+         * @throws SubscriptionNotFoundException
+         * @throws AccessRecordNotFoundException
+         * @throws \IntellivoidAPI\Exceptions\DatabaseException
+         * @throws InvalidRateLimitConfiguration
+         * @throws \IntellivoidAPI\Exceptions\InvalidSearchMethodException
+         * @throws DatabaseException
+         * @throws InvalidSearchMethodException
          */
-        public function validateUserSubscription(OpenBlu $openBlu, AccessRecord $accessRecord)
+        public function validateUserSubscription(CoffeeHouse $coffeeHouse, AccessRecord $accessRecord)
         {
             try
             {
-                $UserSubscription = $openBlu->getUserSubscriptionManager()->getUserSubscription(
+                $UserSubscription = $coffeeHouse->getUserSubscriptionManager()->getUserSubscription(
                     UserSubscriptionSearchMethod::byAccessRecordID, $accessRecord->ID
                 );
             }
-            catch (UserSubscriptionRecordNotFoundException $e)
+            catch (UserSubscriptionNotFoundException $e)
             {
                 return $this::buildResponse(array(
                     'success' => false,
@@ -145,8 +155,8 @@
                     );
 
                     $Features = Converter::featuresToSA($Subscription->Properties->Features, true);
-                    $accessRecord->Variables['MAX_SERVER_CONFIGS'] = $Features['SERVER_CONFIGS'];
-                    $accessRecord->Variables['SERVER_CONFIGS'] = 0;
+                    $accessRecord->Variables['MAX_LYDIA_SESSIONS'] = $Features['LYDIA_SESSIONS'];
+                    $accessRecord->Variables['LYDIA_SESSIONS'] = 0;
 
                     $IntellivoidAPI = Handler::getIntellivoidAPI();
                     $IntellivoidAPI->getAccessKeyManager()->updateAccessRecord($accessRecord);

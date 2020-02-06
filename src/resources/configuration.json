@@ -1,7 +1,7 @@
 {
 	"NAME": "Demo API",
 	"DOCUMENTATION_URL": "https://example.com/",
-	"BASE_PATH": "/openblu",
+	"BASE_PATH": "/coffeehouse",
 	"AVAILABLE": true,
 	"UNAVAILABLE_MESSAGE": "This API service is not available right now",
 	"DEBUG_EXCEPTIONS": true,
@@ -42,8 +42,8 @@
 			},
 			"MODULES": [
 				{
-					"script": "ping", "path": "tests/ping",
-					"available": true, "authentication_required": false,
+					"script": "create_lydia_session", "path": "lydia/create/session",
+					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
 				}
 			]

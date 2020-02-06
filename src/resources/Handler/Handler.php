@@ -152,7 +152,7 @@
          * @param bool $post
          * @return array
          */
-        private static function getParameters(bool $get=true, bool $post=true): array
+        public static function getParameters(bool $get=true, bool $post=true): array
         {
             $parameters = array();
 
@@ -527,6 +527,7 @@
 
                         header('Content-Type: ' . $ModuleObject->getContentType());
                         header('Content-Size: ' . $ModuleObject->getContentLength());
+                        http_response_code($ModuleObject->getResponseCode());
 
                         // Create the response
                         if($ModuleObject->isFile())
