@@ -42,12 +42,17 @@
 			},
 			"MODULES": [
 				{
-					"script": "create_lydia_session", "path": "lydia/create/session",
+					"script": "create_lydia_session", "path": "lydia/session/get",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
 				},
 				{
-					"script": "get_lydia_session", "path": "lydia/get/session",
+					"script": "get_lydia_session", "path": "lydia/session/create",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
+				},
+				{
+					"script": "lydia_think_thought", "path": "lydia/session/think",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
 				}
