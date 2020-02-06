@@ -1,10 +1,10 @@
 {
-	"NAME": "Demo API",
+	"NAME": "CoffeeHouse API",
 	"DOCUMENTATION_URL": "https://example.com/",
 	"BASE_PATH": "/coffeehouse",
 	"AVAILABLE": true,
 	"UNAVAILABLE_MESSAGE": "This API service is not available right now",
-	"DEBUG_EXCEPTIONS": true,
+	"DEBUG_EXCEPTIONS": false,
 	"VERSION_CONFIGURATIONS": [
 		{
 			"VERSION": "v1",
