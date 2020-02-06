@@ -60,7 +60,7 @@
          *
          * @var int
          */
-        private $response_code;
+        private $response_code = 200;
 
         /**
          * @inheritDoc

@@ -45,6 +45,11 @@
 					"script": "create_lydia_session", "path": "lydia/create/session",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
+				},
+				{
+					"script": "get_lydia_session", "path": "lydia/get/session",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
 				}
 			]
 		}
