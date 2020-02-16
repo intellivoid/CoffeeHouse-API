@@ -235,22 +235,19 @@
 
             if($CleverBot->getSession()->Available == false)
             {
-                if((int)time() > $CleverBot->getSession()->Expires)
-                {
-                    $ResponsePayload = array(
-                        'success' => false,
-                        'response_code' => 410,
-                        'error' => array(
-                            'error_code' => 0,
-                            'type' => "CLIENT",
-                            "message" => "The session is no longer available"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload['response_code'];
+                $ResponsePayload = array(
+                    'success' => false,
+                    'response_code' => 410,
+                    'error' => array(
+                        'error_code' => 0,
+                        'type' => "CLIENT",
+                        "message" => "The session is no longer available"
+                    )
+                );
+                $this->response_content = json_encode($ResponsePayload);
+                $this->response_code = (int)$ResponsePayload['response_code'];
 
-                    return null;
-                }
+                return null;
             }
 
             try

@@ -3,12 +3,8 @@
     namespace modules\v1;
 
     use CoffeeHouse\Abstracts\ForeignSessionSearchMethod;
-    use CoffeeHouse\Bots\Cleverbot;
     use CoffeeHouse\CoffeeHouse;
-    use CoffeeHouse\Exceptions\BotSessionException;
-    use CoffeeHouse\Exceptions\DatabaseException;
     use CoffeeHouse\Exceptions\ForeignSessionNotFoundException;
-    use CoffeeHouse\Exceptions\InvalidSearchMethodException;
     use Exception;
     use Handler\Abstracts\Module;
     use Handler\GenericResponses\InternalServerError;
