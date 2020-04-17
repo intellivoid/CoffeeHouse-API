@@ -283,6 +283,8 @@
                 )
             );
 
+            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'ai_responses', 0);
+            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'ai_responses', $this->access_record->ID);
             $this->response_content = json_encode($ResponsePayload);
             $this->response_code = (int)$ResponsePayload['response_code'];
         }
