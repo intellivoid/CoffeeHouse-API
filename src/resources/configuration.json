@@ -38,13 +38,6 @@
 					"NAMESPACE": "COASniffle",
 					"MAIN_CLASS": "COASniffle",
 					"CHECK_EXISTS": true
-				},
-				"DeepAnalytics": {
-					"DIRECTORY_NAME": "DeepAnalytics",
-					"AUTOLOADER": "DeepAnalytics.php",
-					"NAMESPACE": "DeepAnalytics",
-					"MAIN_CLASS": "DeepAnalytics",
-					"CHECK_EXISTS": true
 				}
 			},
 			"MODULES": [
