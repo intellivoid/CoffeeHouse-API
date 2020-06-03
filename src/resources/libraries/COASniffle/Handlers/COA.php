@@ -377,8 +377,26 @@
         }
 
         /**
+         * Gets the URL for a brand
+         *
+         * @param string $resource
+         * @param string $userPublicId
+         * @return string
+         */
+        public static function getBrandUrl(string $resource, string $userPublicId): string
+        {
+            $Parameters = array(
+                'app_id' => $userPublicId,
+                'resource' => $resource
+            );
+
+            return COA_SNIFFLE_ENDPOINT . '/user/contents/public/application?' . http_build_query($Parameters);
+        }
+
+        /**
          * @param string $access_token
          * @param string $plan_name
+         * @param string $redirect
          * @param string $promotion_code
          * @return SubscriptionPurchaseResults
          * @throws BadResponseException
@@ -386,7 +404,7 @@
          * @throws RequestFailedException
          * @throws UnsupportedAuthMethodException
          */
-        public function createSubscription(string $access_token, string $plan_name, string $promotion_code="None"): SubscriptionPurchaseResults
+        public function createSubscription(string $access_token, string $plan_name, string $redirect="None", string $promotion_code="None"): SubscriptionPurchaseResults
         {
             $RequestPayload = array(
                 'application_id' => COA_SNIFFLE_APP_PUBLIC_ID,
@@ -398,6 +416,11 @@
             if($promotion_code !== "None")
             {
                 $RequestPayload['promotion_code'] = $promotion_code;
+            }
+
+            if($redirect !== "None")
+            {
+                $RequestPayload['redirect'] = $redirect;
             }
 
             $Response = RequestBuilder::sendRequest(

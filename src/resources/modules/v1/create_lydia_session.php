@@ -420,6 +420,8 @@
                 )
             );
 
+            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'created_sessions', 0);
+            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'created_sessions', $this->access_record->ID);
             $this->response_content = json_encode($ResponsePayload);
             $this->response_code = (int)$ResponsePayload['response_code'];
         }

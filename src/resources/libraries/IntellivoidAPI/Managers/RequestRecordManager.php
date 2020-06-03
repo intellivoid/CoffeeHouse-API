@@ -199,6 +199,9 @@
 
             if($QueryResults == true)
             {
+                $this->intellivoidAPI->getDeepAnalytics()->tally("intellivoid_api", "requests", 0);
+                $this->intellivoidAPI->getDeepAnalytics()->tally("intellivoid_api", "requests", $access_record_id);
+                $this->intellivoidAPI->getDeepAnalytics()->tally("intellivoid_api", "application_requests", $application_id);
                 return $reference_id;
             }
             else

@@ -5,6 +5,7 @@
 
 
     use acm\acm;
+    use DeepAnalytics\DeepAnalytics;
     use Exception;
     use IntellivoidAPI\Managers\AccessRecordManager;
     use IntellivoidAPI\Managers\ExceptionRecordManager;
@@ -58,6 +59,11 @@
         include_once(__DIR__ . DIRECTORY_SEPARATOR . 'ZiProto' . DIRECTORY_SEPARATOR . 'ZiProto.php');
     }
 
+    if(class_exists('DeepAnalytics\DeepAnalytics') == false)
+    {
+        include_once(__DIR__ . DIRECTORY_SEPARATOR . 'DeepAnalytics' . DIRECTORY_SEPARATOR . 'DeepAnalytics.php');
+    }
+
     /**
      * Class IntellivoidAPI
      * @package IntellivoidAPI
@@ -95,6 +101,11 @@
         private $ExceptionRecordManager;
 
         /**
+         * @var DeepAnalytics
+         */
+        private $DeepAnalytics;
+
+        /**
          * IntellivoidAPI constructor.
          */
         public function __construct()
@@ -123,6 +134,7 @@
             $this->AccessKeyManager = new AccessRecordManager($this);
             $this->ExceptionRecordManager = new ExceptionRecordManager($this);
             $this->RequestRecordManager = new RequestRecordManager($this);
+            $this->DeepAnalytics = new DeepAnalytics();
         }
 
         /**
@@ -173,4 +185,11 @@
             return $this->ExceptionRecordManager;
         }
 
+        /**
+         * @return DeepAnalytics
+         */
+        public function getDeepAnalytics(): DeepAnalytics
+        {
+            return $this->DeepAnalytics;
+        }
     }
