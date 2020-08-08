@@ -10,36 +10,13 @@
 			"VERSION": "v1",
 			"AVAILABLE": true,
 			"UNAVAILABLE_MESSAGE": "This version is not available at the moment, please check back later",
-			"LIBRARIES": {
-				"IntellivoidAPI": {
-					"DIRECTORY_NAME": "IntellivoidAPI",
-					"AUTOLOADER": "IntellivoidAPI.php",
-					"NAMESPACE": "IntellivoidAPI",
-					"MAIN_CLASS": "IntellivoidAPI",
-					"CHECK_EXISTS": true
-				},
-				"IntellivoidSubscriptionManager": {
-					"DIRECTORY_NAME": "IntellivoidSubscriptionManager",
-					"AUTOLOADER": "IntellivoidSubscriptionManager.php",
-					"NAMESPACE": "IntellivoidSubscriptionManager",
-					"MAIN_CLASS": "IntellivoidSubscriptionManager",
-					"CHECK_EXISTS": true
-				},
-				"CoffeeHouse": {
-					"DIRECTORY_NAME": "CoffeeHouse",
-					"AUTOLOADER": "CoffeeHouse.php",
-					"NAMESPACE": "CoffeeHouse",
-					"MAIN_CLASS": "CoffeeHouse",
-					"CHECK_EXISTS": true
-				},
-				"COASniffle": {
-					"DIRECTORY_NAME": "COASniffle",
-					"AUTOLOADER": "COASniffle.php",
-					"NAMESPACE": "COASniffle",
-					"MAIN_CLASS": "COASniffle",
-					"CHECK_EXISTS": true
-				}
-			},
+			"LIBRARIES": {},
+			"PPM": [
+				{"package": "net.intellivoid.api", "version": "latest", "import_dependencies": true, "throw_error": true},
+				{"package": "net.intellivoid.coffeehouse", "version": "latest", "import_dependencies": true, "throw_error": true},
+				{"package": "net.intellivoid.subscriptions", "version": "latest", "import_dependencies": true, "throw_error": true},
+				{"package": "net.intellivoid.coa_sniffle", "version": "latest", "import_dependencies": true, "throw_error": true}
+			],
 			"MODULES": [
 				{
 					"script": "create_lydia_session", "path": "lydia/session/create",

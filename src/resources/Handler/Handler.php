@@ -22,10 +22,10 @@
     use IntellivoidAPI\Abstracts\SearchMethods\RequestRecordSearchMethod;
     use IntellivoidAPI\Exceptions\AccessRecordNotFoundException;
     use IntellivoidAPI\Exceptions\DatabaseException;
-    use IntellivoidAPI\Exceptions\InvalidSearchMethodException;
     use IntellivoidAPI\IntellivoidAPI;
     use IntellivoidAPI\Objects\AccessRecord;
     use IntellivoidAPI\Objects\RequestRecordEntry;
+    use ppm\ppm;
 
     define("HANDLER_DIRECTORY", __DIR__, false);
     define("LIBRARIES_DIRECTORY", __DIR__ . DIRECTORY_SEPARATOR .'..' . DIRECTORY_SEPARATOR . 'libraries', false);
@@ -49,11 +49,23 @@
     require_once(HANDLER_DIRECTORY . DIRECTORY_SEPARATOR . 'Objects' . DIRECTORY_SEPARATOR . 'Library.php');
     require_once(HANDLER_DIRECTORY . DIRECTORY_SEPARATOR . 'Objects' . DIRECTORY_SEPARATOR . 'MainConfiguration.php');
     require_once(HANDLER_DIRECTORY . DIRECTORY_SEPARATOR . 'Objects' . DIRECTORY_SEPARATOR . 'ModuleConfiguration.php');
+    require_once(HANDLER_DIRECTORY . DIRECTORY_SEPARATOR . 'Objects' . DIRECTORY_SEPARATOR . 'PpmDependency.php');
     require_once(HANDLER_DIRECTORY . DIRECTORY_SEPARATOR . 'Objects' . DIRECTORY_SEPARATOR . 'VersionConfiguration.php');
     require_once(HANDLER_DIRECTORY . DIRECTORY_SEPARATOR . 'Router.php');
 
     // Load Intellivoid API
-    require_once(LIBRARIES_DIRECTORY . DIRECTORY_SEPARATOR . 'IntellivoidAPI' . DIRECTORY_SEPARATOR . 'IntellivoidAPI.php');
+    if(defined("PPM") == false)
+    {
+        /** @noinspection PhpIncludeInspection */
+        require("ppm");
+
+        if(defined("PPM") == false)
+        {
+            throw new Exception("Cannot import PPM, is it installed?");
+        }
+    }
+
+    ppm::import("net.intellivoid.api", "latest");
 
     /**
      * Class Handler
@@ -611,15 +623,23 @@
             self::createModuleRoute();
 
             // Load module and version paths
+            /** @var VersionConfiguration $versionConfiguration */
             foreach(self::$MainConfiguration->VersionConfigurations as $versionConfiguration)
             {
                 self::$MainConfiguration->VersionConfigurations[$versionConfiguration->Version] = $versionConfiguration;
                 self::$PathRoutes[$versionConfiguration->Version] = [];
 
-                /** @var Library $library */
-                foreach($versionConfiguration->Libraries as $library)
+                if($versionConfiguration->Libraries !== null)
                 {
-                    $library->import();
+                    foreach($versionConfiguration->Libraries as $library)
+                    {
+                        $library->import();
+                    }
+                }
+
+                foreach($versionConfiguration->PpmPackages as $package)
+                {
+                    $package->import();
                 }
 
                 /** @var ModuleConfiguration $module */

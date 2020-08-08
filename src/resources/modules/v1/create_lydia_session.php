@@ -18,7 +18,7 @@
     /**
      * Class create_lydia_session
      */
-    class create_lydia_session extends Module implements  Response
+    class create_lydia_session extends Module implements Response
     {
         /**
          * The name of the module
@@ -107,7 +107,7 @@
          */
         public function getFileName(): string
         {
-            return null;
+            return;
         }
 
         /**
