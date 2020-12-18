@@ -344,7 +344,7 @@
                         'success' => false,
                         'response_code' => 429,
                         'error' => array(
-                            'error_code' => 0,
+                            'error_code' => 6,
                             'type' => "CLIENT",
                             "message" => "Lydia sessions quota limit reached"
                         )
@@ -372,7 +372,7 @@
                         'success' => false,
                         'response_code' => 400,
                         'error' => array(
-                            'error_code' => 0,
+                            'error_code' => 7,
                             'type' => "CLIENT",
                             "message" => "The given language code is not a valid ISO 639-1 Language Code"
                         )
@@ -398,7 +398,7 @@
                     'success' => false,
                     'response_code' => 503,
                     'error' => array(
-                        'error_code' => 0,
+                        'error_code' => 8,
                         'type' => "CLIENT",
                         "message" => "Session cannot be created, service unavailable"
                     )

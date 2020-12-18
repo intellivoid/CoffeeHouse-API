@@ -147,7 +147,7 @@
                     'success' => false,
                     'response_code' => 400,
                     'error' => array(
-                        'error_code' => 0,
+                        'error_code' => 1,
                         'type' => "CLIENT",
                         "message" => "Missing parameter 'session_id'"
                     )
@@ -170,7 +170,7 @@
                     'success' => false,
                     'response_code' => 404,
                     'error' => array(
-                        'error_code' => 0,
+                        'error_code' => 4,
                         'type' => "CLIENT",
                         "message" => "The session was not found"
                     )

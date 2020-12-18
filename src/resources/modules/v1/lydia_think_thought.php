@@ -148,7 +148,7 @@
                     'success' => false,
                     'response_code' => 400,
                     'error' => array(
-                        'error_code' => 0,
+                        'error_code' => 1,
                         'type' => "CLIENT",
                         "message" => "Missing parameter 'session_id'"
                     )
@@ -165,7 +165,7 @@
                     'success' => false,
                     'response_code' => 400,
                     'error' => array(
-                        'error_code' => 0,
+                        'error_code' => 2,
                         'type' => "CLIENT",
                         "message" => "Missing parameter 'input'"
                     )
@@ -182,7 +182,7 @@
                     'success' => false,
                     'response_code' => 400,
                     'error' => array(
-                        'error_code' => 0,
+                        'error_code' => 3,
                         'type' => "CLIENT",
                         "message" => "Parameter 'input' contains an invalid value"
                     )
@@ -205,7 +205,7 @@
                     'success' => false,
                     'response_code' => 404,
                     'error' => array(
-                        'error_code' => 0,
+                        'error_code' => 4,
                         'type' => "CLIENT",
                         "message" => "The session was not found"
                     )
@@ -222,7 +222,7 @@
                     'success' => false,
                     'response_code' => 410,
                     'error' => array(
-                        'error_code' => 0,
+                        'error_code' => 5,
                         'type' => "CLIENT",
                         "message" => "The session is no longer available"
                     )
@@ -239,7 +239,7 @@
                     'success' => false,
                     'response_code' => 410,
                     'error' => array(
-                        'error_code' => 0,
+                        'error_code' => 5,
                         'type' => "CLIENT",
                         "message" => "The session is no longer available"
                     )
@@ -264,7 +264,7 @@
                     'success' => false,
                     'response_code' => 410,
                     'error' => array(
-                        'error_code' => 0,
+                        'error_code' => 5,
                         'type' => "CLIENT",
                         "message" => "The session is no longer available"
                     )
