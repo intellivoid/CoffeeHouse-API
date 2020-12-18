@@ -1,6 +1,6 @@
 {
 	"NAME": "CoffeeHouse API",
-	"DOCUMENTATION_URL": "https://gist.github.com/Netkas/e8977b26f482ca40911a949df7dd286f",
+	"DOCUMENTATION_URL": "https://docs.intellivoid.net/coffeehouse/v1/introduction",
 	"BASE_PATH": "/coffeehouse",
 	"AVAILABLE": true,
 	"UNAVAILABLE_MESSAGE": "This API service is not available right now",
