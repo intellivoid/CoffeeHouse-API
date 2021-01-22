@@ -28,30 +28,30 @@
             if(Handler::$MainConfiguration->DebugExceptions)
             {
                 $error_details = array(
-                    'error_code' => $exception->getCode(),
-                    'type' => 'SERVICE',
-                    'message' => $exception->getMessage(),
-                    'file' => $exception->getFile(),
-                    'line' => $exception->getLine(),
-                    'code' => $exception->getCode(),
-                    'trace' => $exception->getTrace()
+                    "error_code" => $exception->getCode(),
+                    "type" => 'SERVICE',
+                    "message" => $exception->getMessage(),
+                    "file" => $exception->getFile(),
+                    "line" => $exception->getLine(),
+                    "code" => $exception->getCode(),
+                    "trace" => $exception->getTrace()
                 );
             }
             else
             {
                 $error_details =  array(
-                    'error_code' => $exception->getCode(),
-                    'type' => "SERVICE",
+                    "error_code" => $exception->getCode(),
+                    "type" => "SERVICE",
                     "message" => "There was an internal server error when trying to process your request"
                 );
             }
 
             $ResponsePayload = array(
-                'success' => false,
-                'response_code' => 500,
-                'error' => $error_details
+                "success" => false,
+                "response_code" => 500,
+                "error" => $error_details
             );
-            $ResponseBody = json_encode($ResponsePayload);
+            $ResponseBody = json_encode($ResponsePayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
             http_response_code(500);
             header('Content-Type: application/json');
