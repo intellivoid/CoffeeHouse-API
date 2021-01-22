@@ -1,11 +1,10 @@
-<?php
+<?php /** @noinspection PhpMissingFieldTypeInspection */
 
     namespace modules\v1;
 
     use CoffeeHouse\Bots\Cleverbot;
     use CoffeeHouse\CoffeeHouse;
     use CoffeeHouse\Exceptions\BotSessionException;
-    use CoffeeHouse\Exceptions\CoffeeHouseUtilsNotReadyException;
     use CoffeeHouse\Exceptions\ForeignSessionNotFoundException;
     use Exception;
     use Handler\Abstracts\Module;
@@ -67,7 +66,7 @@
         /**
          * @inheritDoc
          */
-        public function getContentType(): string
+        public function getContentType(): ?string
         {
             return "application/json";
         }
@@ -75,7 +74,7 @@
         /**
          * @inheritDoc
          */
-        public function getContentLength(): int
+        public function getContentLength(): ?int
         {
             return strlen($this->response_content);
         }
@@ -83,7 +82,7 @@
         /**
          * @inheritDoc
          */
-        public function getBodyContent(): string
+        public function getBodyContent(): ?string
         {
             return $this->response_content;
         }
@@ -91,7 +90,7 @@
         /**
          * @inheritDoc
          */
-        public function getResponseCode(): int
+        public function getResponseCode(): ?int
         {
             return $this->response_code;
         }
@@ -99,7 +98,7 @@
         /**
          * @inheritDoc
          */
-        public function isFile(): bool
+        public function isFile(): ?bool
         {
             return false;
         }
@@ -107,7 +106,7 @@
         /**
          * @inheritDoc
          */
-        public function getFileName(): string
+        public function getFileName(): ?string
         {
             return "";
         }
@@ -217,6 +216,11 @@
 
                 return null;
             }
+            catch(Exception $e)
+            {
+                InternalServerError::executeResponse($e);
+                exit();
+            }
 
             if((int)time() > $CleverBot->getSession()->Expires)
             {
@@ -260,6 +264,7 @@
             {
                 $Session = $CleverBot->getSession();
                 $Session->Available = false;
+                /** @noinspection PhpUnhandledExceptionInspection */
                 $CoffeeHouse->getForeignSessionsManager()->updateSession($Session);
 
                 $ResponsePayload = array(
@@ -275,6 +280,11 @@
                 $this->response_code = (int)$ResponsePayload["response_code"];
 
                 return null;
+            }
+            catch(Exception $e)
+            {
+                InternalServerError::executeResponse($e);
+                exit();
             }
 
             $ResponsePayload = array(
