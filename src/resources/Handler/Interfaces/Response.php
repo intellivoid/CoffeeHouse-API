@@ -14,44 +14,44 @@
         /**
          * Returns the content type which is used for the header
          *
-         * @return string
+         * @return string|null
          */
-        public function getContentType(): string;
+        public function getContentType(): ?string;
 
         /**
          * Returns the content length
          *
-         * @return int
+         * @return int|null
          */
-        public function getContentLength(): int;
+        public function getContentLength(): ?int;
 
         /**
          * Returns the body content
          *
-         * @return string
+         * @return string|null
          */
-        public function getBodyContent(): string;
+        public function getBodyContent(): ?string;
 
         /**
          * Returns the HTTP response code
          *
-         * @return int
+         * @return int|null
          */
-        public function getResponseCode(): int;
+        public function getResponseCode(): ?int;
 
         /**
          * Indicates if the response is a file download
          *
-         * @return bool
+         * @return bool|null
          */
-        public function isFile(): bool;
+        public function isFile(): ?bool;
 
         /**
          * Returns the file name if the response is a file download
          *
-         * @return string
+         * @return string|null
          */
-        public function getFileName(): string;
+        public function getFileName(): ?string;
 
         /**
          * Main execution point, it processes the request before it determines the values for this request

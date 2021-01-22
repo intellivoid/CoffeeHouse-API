@@ -3,8 +3,10 @@
     namespace modules\v1;
 
     use CoffeeHouse\Abstracts\ForeignSessionSearchMethod;
+    use CoffeeHouse\Abstracts\LocalSessionSearchMethod;
     use CoffeeHouse\CoffeeHouse;
     use CoffeeHouse\Exceptions\ForeignSessionNotFoundException;
+    use CoffeeHouse\Exceptions\LocalSessionNotFoundException;
     use Exception;
     use Handler\Abstracts\Module;
     use Handler\GenericResponses\InternalServerError;
@@ -16,30 +18,30 @@
     include_once(__DIR__ . DIRECTORY_SEPARATOR . "script.check_subscription.php");
 
     /**
-     * Class get_lydia_session
+     * Class get_lydia_session_attributes
      */
-    class get_lydia_session extends Module implements  Response
+    class get_lydia_session_attributes extends Module implements  Response
     {
         /**
          * The name of the module
          *
          * @var string
          */
-        public $name = "get_lydia_session";
+        public $name = "get_lydia_session_attributes";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "1.0.2.0";
+        public $version = "1.0.0.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Gets an existing Lydia Session";
+        public $description = "Returns the attributes of an existing session";
 
         /**
          * Optional access record for this module
@@ -107,7 +109,7 @@
          */
         public function getFileName(): ?string
         {
-            return null;
+            return "";
         }
 
         /**
@@ -182,6 +184,29 @@
                 return null;
             }
 
+            try
+            {
+                $LocalSession = $CoffeeHouse->getLocalSessionManager()->getLocalSession(
+                    LocalSessionSearchMethod::ByForeignSessionId, $Session->ID
+                );
+            }
+            catch (LocalSessionNotFoundException)
+            {
+                $ResponsePayload = array(
+                    "success" => false,
+                    "response_code" => 404,
+                    "error" => array(
+                        "error_code" => 9,
+                        "type" => "CLIENT",
+                        "message" => "This session does not contain any attributes"
+                    )
+                );
+                $this->response_content = json_encode($ResponsePayload);
+                $this->response_code = (int)$ResponsePayload["response_code"];
+
+                return null;
+            }
+
             if((int)time() > $Session->Expires)
             {
                 $Session->Available = false;
@@ -191,10 +216,8 @@
                 "success" => true,
                 "response_code" => 200,
                 "results" => array(
-                    "session_id" => $Session->SessionID,
-                    "language" => $Session->Language,
-                    "available" => (bool)$Session->Available,
-                    "expires" => (int)$Session->Expires
+                    "ai_emotion" => $LocalSession->AiCurrentEmotion,
+                    "current_language" => $LocalSession->PredictedLanguage
                 )
             );
 

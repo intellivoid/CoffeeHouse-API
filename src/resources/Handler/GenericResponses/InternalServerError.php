@@ -40,7 +40,7 @@
             else
             {
                 $error_details =  array(
-                    "error_code" => $exception->getCode(),
+                    "error_code" => -1,
                     "type" => "SERVICE",
                     "message" => "There was an internal server error when trying to process your request"
                 );
@@ -55,7 +55,6 @@
 
             http_response_code(500);
             header('Content-Type: application/json');
-            header('Content-Size: ' . strlen($ResponseBody));
             print($ResponseBody);
         }
     }

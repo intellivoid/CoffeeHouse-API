@@ -48,15 +48,15 @@
          * @param CoffeeHouse $coffeeHouse
          * @param AccessRecord $accessRecord
          * @return null|array
-         * @throws SubscriptionNotFoundException
          * @throws AccessRecordNotFoundException
-         * @throws \IntellivoidAPI\Exceptions\DatabaseException
-         * @throws InvalidRateLimitConfiguration
-         * @throws \IntellivoidAPI\Exceptions\InvalidSearchMethodException
          * @throws DatabaseException
+         * @throws InvalidRateLimitConfiguration
          * @throws InvalidSearchMethodException
+         * @throws SubscriptionNotFoundException
+         * @throws \IntellivoidAPI\Exceptions\DatabaseException
+         * @throws \IntellivoidAPI\Exceptions\InvalidSearchMethodException
          */
-        public function validateUserSubscription(CoffeeHouse $coffeeHouse, AccessRecord $accessRecord)
+        public function validateUserSubscription(CoffeeHouse $coffeeHouse, AccessRecord $accessRecord): ?array
         {
             try
             {
@@ -67,15 +67,17 @@
             catch (UserSubscriptionNotFoundException $e)
             {
                 return $this::buildResponse(array(
-                    'success' => false,
-                    'response_code' => 500,
-                    'error' => array(
-                            'error_code' => 0,
-                            'type' => "SUBSCRIPTION",
-                            "message" => "There was an error while trying to verify your subscription"
+                    "success" => false,
+                    "response_code" => 500,
+                    "error" => array(
+                            "error_code" => 0,
+                            "type" => "SUBSCRIPTION",
+                            "message" => "There was an error while trying to verify your subscription, the system couldn't find your subscription."
                         )
-                    ), 500, array(
-                        'access_record' => $accessRecord->toArray()
+                    ),
+                    500,
+                    array(
+                        "access_record" => $accessRecord->toArray()
                     )
                 );
 
@@ -86,7 +88,6 @@
                 exit();
             }
 
-            /** @var IntellivoidSubscriptionManager $IntellivoidSubscriptionManager */
             $IntellivoidSubscriptionManager = new IntellivoidSubscriptionManager();
             $this->intellivoid_subscription_manager = $IntellivoidSubscriptionManager;
 
@@ -96,19 +97,21 @@
                     SubscriptionSearchMethod::byId, $UserSubscription->SubscriptionID
                 );
             }
-            catch (SubscriptionNotFoundException $e)
+            catch (SubscriptionNotFoundException)
             {
                 return $this::buildResponse(array(
-                    'success' => false,
-                    'response_code' => 403,
-                    'error' => array(
-                            'error_code' => 0,
-                            'type' => "SUBSCRIPTION",
+                    "success" => false,
+                    "response_code" => 403,
+                    "error" => array(
+                            "error_code" => 0,
+                            "type" => "SUBSCRIPTION",
                             "message" => "You do not have an active subscription with this service"
                         )
-                    ), 403, array(
-                        'access_record' => $accessRecord->toArray(),
-                        'user_subscription' => $UserSubscription->toArray()
+                    ),
+                    403,
+                    array(
+                        "access_record" => $accessRecord->toArray(),
+                        "user_subscription" => $UserSubscription->toArray()
                     )
                 );
             }
@@ -129,16 +132,16 @@
                 catch (CoaAuthenticationException $e)
                 {
                     return $this::buildResponse(array(
-                        'success' => false,
-                        'response_code' => 500,
-                        'error' => array(
-                                'error_code' => $e->getCode(),
-                                'type' => "SUBSCRIPTION",
+                        "success" => false,
+                        "response_code" => 500,
+                        "error" => array(
+                                "error_code" => $e->getCode(),
+                                "type" => "SUBSCRIPTION",
                                 "message" => $e->getMessage()
                             )
                         ), 500, array(
-                            'access_record' => $accessRecord->toArray(),
-                            'user_subscription' => $UserSubscription->toArray()
+                            "access_record" => $accessRecord->toArray(),
+                            "user_subscription" => $UserSubscription->toArray()
                         )
                     );
                 }
@@ -148,21 +151,25 @@
                     exit();
                 }
 
+                $Subscription = $IntellivoidSubscriptionManager->getSubscriptionManager()->getSubscription(
+                    SubscriptionSearchMethod::byId, $UserSubscription->SubscriptionID
+                );
+
+                // PATCH: Sometimes if a user wants to upgrade their subscription, the features are not yet applied.
+                $Features = Converter::featuresToSA($Subscription->Properties->Features, true);
+
+                if(isset($Features["LYDIA_SESSIONS"]))
+                    $accessRecord->Variables["MAX_LYDIA_SESSIONS"] = (int)$Features["LYDIA_SESSIONS"];
+
                 if($BillingProcessed)
                 {
-                    $Subscription = $IntellivoidSubscriptionManager->getSubscriptionManager()->getSubscription(
-                        SubscriptionSearchMethod::byId, $UserSubscription->SubscriptionID
-                    );
-
-                    $Features = Converter::featuresToSA($Subscription->Properties->Features, true);
-                    $accessRecord->Variables['MAX_LYDIA_SESSIONS'] = $Features['LYDIA_SESSIONS'];
-                    $accessRecord->Variables['LYDIA_SESSIONS'] = 0;
-
-                    $IntellivoidAPI = Handler::getIntellivoidAPI();
-                    $IntellivoidAPI->getAccessKeyManager()->updateAccessRecord($accessRecord);
+                    $accessRecord->Variables["LYDIA_SESSIONS"] = 0;
                 }
-            }
 
+                $IntellivoidAPI = Handler::getIntellivoidAPI();
+                $IntellivoidAPI->getAccessKeyManager()->updateAccessRecord($accessRecord);
+
+            }
 
             $this->subscription = $Subscription;
             $this->user_subscription = $UserSubscription;
@@ -181,9 +188,9 @@
         private static function buildResponse(array $response_content, int $response_code, array $debugging_info): array
         {
             return array(
-                'response' => $response_content,
-                'response_code' => (int)$response_code,
-                'debug' => $debugging_info
+                "response" => $response_content,
+                "response_code" => (int)$response_code,
+                "debug" => $debugging_info
             );
         }
     }

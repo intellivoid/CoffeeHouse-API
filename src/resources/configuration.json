@@ -29,6 +29,11 @@
 					"unavailable_message": "This module is not available at the moment"
 				},
 				{
+					"script": "get_lydia_session_attributes", "path": "lydia/session/attributes",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
+				},
+				{
 					"script": "lydia_think_thought", "path": "lydia/session/think",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"

@@ -5,6 +5,7 @@
     use CoffeeHouse\Bots\Cleverbot;
     use CoffeeHouse\CoffeeHouse;
     use CoffeeHouse\Exceptions\BotSessionException;
+    use CoffeeHouse\Exceptions\CoffeeHouseUtilsNotReadyException;
     use CoffeeHouse\Exceptions\ForeignSessionNotFoundException;
     use Exception;
     use Handler\Abstracts\Module;
@@ -14,7 +15,7 @@
     use IntellivoidAPI\Objects\AccessRecord;
     use SubscriptionValidation;
 
-    include_once(__DIR__ . DIRECTORY_SEPARATOR . 'script.check_subscription.php');
+    include_once(__DIR__ . DIRECTORY_SEPARATOR . "script.check_subscription.php");
 
     /**
      * Class lydia_think_thought
@@ -26,14 +27,14 @@
          *
          * @var string
          */
-        public $name = 'lydia_think_thought';
+        public $name = "lydia_think_thought";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = '1.0.0.0';
+        public $version = "2.0.0.0";
 
         /**
          * The description of this module
@@ -68,7 +69,7 @@
          */
         public function getContentType(): string
         {
-            return 'application/json';
+            return "application/json";
         }
 
         /**
@@ -113,7 +114,7 @@
 
         /**
          * @inheritDoc
-         * @throws Exception
+         * @noinspection DuplicatedCode
          */
         public function processRequest()
         {
@@ -134,84 +135,85 @@
 
             if(is_null($ValidationResponse) == false)
             {
-                $this->response_content = json_encode($ValidationResponse['response']);
-                $this->response_code = $ValidationResponse['response_code'];
+                $this->response_content = json_encode($ValidationResponse["response"]);
+                $this->response_code = $ValidationResponse["response_code"];
 
                 return null;
             }
 
             $Parameters = Handler::getParameters(true, true);
 
-            if(isset($Parameters['session_id']) == false)
+            if(isset($Parameters["session_id"]) == false)
             {
                 $ResponsePayload = array(
-                    'success' => false,
-                    'response_code' => 400,
-                    'error' => array(
-                        'error_code' => 1,
-                        'type' => "CLIENT",
-                        "message" => "Missing parameter 'session_id'"
+                    "success" => false,
+                    "response_code" => 400,
+                    "error" => array(
+                        "error_code" => 1,
+                        "type" => "CLIENT",
+                        "message" => "Missing parameter \"session_id\""
                     )
                 );
                 $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload['response_code'];
+                $this->response_code = (int)$ResponsePayload["response_code"];
 
                 return null;
             }
 
-            if(isset($Parameters['input']) == false)
+            if(isset($Parameters["input"]) == false)
             {
                 $ResponsePayload = array(
-                    'success' => false,
-                    'response_code' => 400,
-                    'error' => array(
-                        'error_code' => 2,
-                        'type' => "CLIENT",
-                        "message" => "Missing parameter 'input'"
+                    "success" => false,
+                    "response_code" => 400,
+                    "error" => array(
+                        "error_code" => 2,
+                        "type" => "CLIENT",
+                        "message" => "Missing parameter \"input\""
                     )
                 );
                 $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload['response_code'];
+                $this->response_code = (int)$ResponsePayload["response_code"];
 
                 return null;
             }
 
-            if(strlen($Parameters['input']) < 1)
+            if(strlen($Parameters["input"]) < 1)
             {
                 $ResponsePayload = array(
-                    'success' => false,
-                    'response_code' => 400,
-                    'error' => array(
-                        'error_code' => 3,
-                        'type' => "CLIENT",
-                        "message" => "Parameter 'input' contains an invalid value"
+                    "success" => false,
+                    "response_code" => 400,
+                    "error" => array(
+                        "error_code" => 3,
+                        "type" => "CLIENT",
+                        "message" => "Parameter \"input\" contains an invalid value"
                     )
                 );
                 $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload['response_code'];
+                $this->response_code = (int)$ResponsePayload["response_code"];
 
                 return null;
             }
 
+            /** @noinspection PhpUnhandledExceptionInspection Doesn't throw any exception */
             $CleverBot = new Cleverbot($CoffeeHouse);
 
             try
             {
-                $CleverBot->loadSession($Parameters['session_id']);
+                $CleverBot->loadSession($Parameters["session_id"]);
             }
-            catch(ForeignSessionNotFoundException $foreignSessionNotFoundException)
+            catch(ForeignSessionNotFoundException)
             {
                 $ResponsePayload = array(
-                    'success' => false,
-                    'response_code' => 404,
-                    'error' => array(
-                        'error_code' => 4,
-                        'type' => "CLIENT",
+                    "success" => false,
+                    "response_code" => 404,
+                    "error" => array(
+                        "error_code" => 4,
+                        "type" => "CLIENT",
                         "message" => "The session was not found"
                     )
                 );
                 $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload['response_code'];
+                $this->response_code = (int)$ResponsePayload["response_code"];
 
                 return null;
             }
@@ -219,16 +221,16 @@
             if((int)time() > $CleverBot->getSession()->Expires)
             {
                 $ResponsePayload = array(
-                    'success' => false,
-                    'response_code' => 410,
-                    'error' => array(
-                        'error_code' => 5,
-                        'type' => "CLIENT",
+                    "success" => false,
+                    "response_code" => 410,
+                    "error" => array(
+                        "error_code" => 5,
+                        "type" => "CLIENT",
                         "message" => "The session is no longer available"
                     )
                 );
                 $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload['response_code'];
+                $this->response_code = (int)$ResponsePayload["response_code"];
 
                 return null;
             }
@@ -236,56 +238,60 @@
             if($CleverBot->getSession()->Available == false)
             {
                 $ResponsePayload = array(
-                    'success' => false,
-                    'response_code' => 410,
-                    'error' => array(
-                        'error_code' => 5,
-                        'type' => "CLIENT",
+                    "success" => false,
+                    "response_code" => 410,
+                    "error" => array(
+                        "error_code" => 5,
+                        "type" => "CLIENT",
                         "message" => "The session is no longer available"
                     )
                 );
                 $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload['response_code'];
+                $this->response_code = (int)$ResponsePayload["response_code"];
 
                 return null;
             }
 
             try
             {
-                $BotResponse = $CleverBot->think($Parameters['input']);
+                $BotResponse = $CleverBot->think($Parameters["input"]);
             }
-            catch(BotSessionException $botSessionException)
+            catch(BotSessionException)
             {
                 $Session = $CleverBot->getSession();
                 $Session->Available = false;
                 $CoffeeHouse->getForeignSessionsManager()->updateSession($Session);
 
                 $ResponsePayload = array(
-                    'success' => false,
-                    'response_code' => 410,
-                    'error' => array(
-                        'error_code' => 5,
-                        'type' => "CLIENT",
+                    "success" => false,
+                    "response_code" => 410,
+                    "error" => array(
+                        "error_code" => 5,
+                        "type" => "CLIENT",
                         "message" => "The session is no longer available"
                     )
                 );
                 $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload['response_code'];
+                $this->response_code = (int)$ResponsePayload["response_code"];
 
                 return null;
             }
 
             $ResponsePayload = array(
-                'success' => true,
-                'response_code' => 200,
-                'payload' => array(
-                    'output' => $BotResponse
+                "success" => true,
+                "response_code" => 200,
+                "results" => array(
+                    "output" => $BotResponse,
+                    "attributes" => [
+                        "ai_emotion" => $CleverBot->getLocalSession()->AiCurrentEmotion,
+                        "current_language" => $CleverBot->getLocalSession()->PredictedLanguage,
+                    ]
                 )
             );
 
-            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'ai_responses', 0);
-            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'ai_responses', $this->access_record->ID);
+            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "ai_responses", 0);
+            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "ai_responses", $this->access_record->ID);
             $this->response_content = json_encode($ResponsePayload);
-            $this->response_code = (int)$ResponsePayload['response_code'];
+            $this->response_code = (int)$ResponsePayload["response_code"];
         }
     }
