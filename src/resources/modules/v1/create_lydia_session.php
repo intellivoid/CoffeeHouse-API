@@ -137,7 +137,7 @@
                         "error" => array(
                             "error_code" => 6,
                             "type" => "CLIENT",
-                            "message" => "Lydia sessions quota limit reached"
+                            "message" => "You have reached the max quota for this method"
                         )
                     );
                     $this->response_content = json_encode($ResponsePayload);

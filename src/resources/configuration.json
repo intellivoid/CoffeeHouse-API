@@ -57,6 +57,12 @@
 					"script": "lydia_think_thought", "path": "lydia/session/think",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
+				},
+
+				{
+					"script": "nsfw_classification", "path": "image/nsfw_classification",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
 				}
 			]
 		}
