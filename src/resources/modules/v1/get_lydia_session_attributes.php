@@ -207,19 +207,37 @@
                 return null;
             }
 
-            if((int)time() > $Session->Expires)
+            try
             {
-                $Session->Available = false;
+                $LocalSession->initialize($CoffeeHouse);
+
+                $ResponsePayload = array(
+                    "success" => true,
+                    "response_code" => 200,
+                    "results" => array(
+                        "ai_emotion" => $LocalSession->AiCurrentEmotion,
+                        "ai_emotion_probability" => $LocalSession->EmotionLargeGeneralization->TopProbability * 100,
+                        "current_language" => $LocalSession->PredictedLanguage,
+                        "current_language_probability" => $LocalSession->LanguageLargeGeneralization->TopProbability * 100
+                    )
+                );
+
+            }
+            catch(Exception)
+            {
+                $ResponsePayload = array(
+                    "success" => true,
+                    "response_code" => 200,
+                    "results" => array(
+                        "ai_emotion" => $LocalSession->AiCurrentEmotion,
+                        "ai_emotion_probability" => null,
+                        "current_language" => $LocalSession->PredictedLanguage,
+                        "current_language_probability" => null
+                    )
+                );
+
             }
 
-            $ResponsePayload = array(
-                "success" => true,
-                "response_code" => 200,
-                "results" => array(
-                    "ai_emotion" => $LocalSession->AiCurrentEmotion,
-                    "current_language" => $LocalSession->PredictedLanguage
-                )
-            );
 
             $this->response_content = json_encode($ResponsePayload);
             $this->response_code = (int)$ResponsePayload["response_code"];

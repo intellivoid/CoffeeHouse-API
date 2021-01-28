@@ -292,9 +292,17 @@
                 "response_code" => 200,
                 "results" => array(
                     "output" => $BotResponse,
+                    "session" => [
+                        "session_id" => $CleverBot->getSession()->SessionID,
+                        "language" => $CleverBot->getSession()->Language,
+                        "available" => (bool)$CleverBot->getSession()->Available,
+                        "expires" => (int)$CleverBot->getSession()->Expires
+                    ],
                     "attributes" => [
                         "ai_emotion" => $CleverBot->getLocalSession()->AiCurrentEmotion,
+                        "ai_emotion_probability" => $CleverBot->getLocalSession()->EmotionLargeGeneralization->TopProbability * 100,
                         "current_language" => $CleverBot->getLocalSession()->PredictedLanguage,
+                        "current_language_probability" => $CleverBot->getLocalSession()->LanguageLargeGeneralization->TopProbability * 100
                     ]
                 )
             );
