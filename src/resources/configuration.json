@@ -12,10 +12,30 @@
 			"UNAVAILABLE_MESSAGE": "This version is not available at the moment, please check back later",
 			"LIBRARIES": {},
 			"PPM": [
-				{"package": "net.intellivoid.api", "version": "latest", "import_dependencies": true, "throw_error": true},
-				{"package": "net.intellivoid.coffeehouse", "version": "latest", "import_dependencies": true, "throw_error": true},
-				{"package": "net.intellivoid.subscriptions", "version": "latest", "import_dependencies": true, "throw_error": true},
-				{"package": "net.intellivoid.coa_sniffle", "version": "latest", "import_dependencies": true, "throw_error": true}
+				{
+					"package": "net.intellivoid.api",
+					"version": "latest",
+					"import_dependencies": true,
+					"throw_error": true
+				},
+				{
+					"package": "net.intellivoid.coffeehouse",
+					"version": "latest",
+					"import_dependencies": true,
+					"throw_error": true
+				},
+				{
+					"package": "net.intellivoid.subscriptions",
+					"version": "latest",
+					"import_dependencies": true,
+					"throw_error": true
+				},
+				{
+					"package": "net.intellivoid.coa_sniffle",
+					"version": "latest",
+					"import_dependencies": true,
+					"throw_error": true
+				}
 			],
 			"MODULES": [
 				{
