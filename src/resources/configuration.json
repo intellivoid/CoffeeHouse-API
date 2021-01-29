@@ -73,6 +73,11 @@
 					"script": "sentiment_analysis", "path": "nlp/sentiment_analysis",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
+				},
+				{
+					"script": "emotion_analysis", "path": "nlp/emotion_analysis",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
 				}
 			]
 		}
