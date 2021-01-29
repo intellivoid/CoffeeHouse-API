@@ -63,6 +63,11 @@
 					"script": "nsfw_classification", "path": "image/nsfw_classification",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
+				},
+				{
+					"script": "pos_tagging", "path": "nlp/pos_tagging",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
 				}
 			]
 		}
