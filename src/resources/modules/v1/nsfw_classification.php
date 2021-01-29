@@ -564,6 +564,16 @@
                 if(file_exists($input))
                 {
                     $results = $coffeeHouse->getNsfwClassification()->classifyImageFile($input, True);
+
+                    try
+                    {
+                        // Save disk-space
+                        unlink($input);
+                    }
+                    catch(Exception)
+                    {
+                        // Do nothing!
+                    }
                 }
                 else
                 {
