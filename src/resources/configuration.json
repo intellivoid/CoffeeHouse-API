@@ -68,6 +68,11 @@
 					"script": "pos_tagging", "path": "nlp/pos_tagging",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
+				},
+				{
+					"script": "sentiment_analysis", "path": "nlp/sentiment_analysis",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
 				}
 			]
 		}
