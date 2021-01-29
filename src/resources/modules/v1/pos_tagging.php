@@ -413,19 +413,33 @@
             }
 
             $SentencesResults = [];
+            $TokenResults = [];
+            $SentenceSplit = false;
+
+            if(isset($Parameters["sentence_split"]))
+            {
+                if((bool)strtolower($Parameters["sentence_split"]) == true)
+                {
+                    $SentenceSplit = true;
+                }
+            }
 
             foreach($PosTagsResults->PartOfSpeechSentences as $partOfSpeechSentence)
             {
                 $pos_tags = [];
                 foreach($partOfSpeechSentence->Tags as $posTag)
                 {
-                    $pos_tags[] = [
+                    $tag = [
                         "text" => $posTag->Word,
                         "offset_begin" => $posTag->CharacterOffsetBegin,
                         "offset_end" => $posTag->CharacterOffsetEnd,
                         "tag_value" => $posTag->Value
                     ];
+
+                    $pos_tags[] = $tag;
+                    $TokenResults[] = $tag;
                 }
+
                 $SentencesResults[] = [
                     "text" => $partOfSpeechSentence->Text,
                     "offset_begin" => $partOfSpeechSentence->OffsetBegin,
@@ -434,15 +448,31 @@
                 ];
             }
 
-            $ResponsePayload = array(
-                "success" => true,
-                "response_code" => 200,
-                "results" => [
-                    "text" => $PosTagsResults->Text,
-                    "source_language" => $source_language,
-                    "sentences" => $SentencesResults
-                ]
-            );
+            if($SentenceSplit)
+            {
+                $ResponsePayload = array(
+                    "success" => true,
+                    "response_code" => 200,
+                    "results" => [
+                        "text" => $PosTagsResults->Text,
+                        "source_language" => $source_language,
+                        "sentences" => $SentencesResults
+                    ]
+                );
+            }
+            else
+            {
+                $ResponsePayload = array(
+                    "success" => true,
+                    "response_code" => 200,
+                    "results" => [
+                        "text" => $PosTagsResults->Text,
+                        "source_language" => $source_language,
+                        "tags" => $TokenResults
+                    ]
+                );
+            }
+
             $this->response_content = json_encode($ResponsePayload);
             $this->response_code = (int)$ResponsePayload["response_code"];
 
