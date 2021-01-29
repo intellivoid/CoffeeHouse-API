@@ -339,9 +339,9 @@
 
                         $probabilities_data[] = [
                             "label" => $probability->Label,
-                            "probabilities" => $probabilities_set,
                             "calculated_probability" => $probability->CalculatedProbability * 100,
-                            "current_pointer" => $probability->CurrentPointer - 1
+                            "current_pointer" => $probability->CurrentPointer - 1,
+                            "probabilities" => $probabilities_set
                         ];
                     }
 
