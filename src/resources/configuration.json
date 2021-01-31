@@ -78,6 +78,11 @@
 					"script": "emotion_analysis", "path": "nlp/emotion_analysis",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
+				},
+				{
+					"script": "chatroom_spam_prediction", "path": "nlp/spam_prediction/chatroom",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
 				}
 			]
 		}
