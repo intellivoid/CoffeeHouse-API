@@ -80,6 +80,11 @@
 					"unavailable_message": "This module is not available at the moment"
 				},
 				{
+					"script": "language_detection", "path": "nlp/language_detection",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
+				},
+				{
 					"script": "chatroom_spam_prediction", "path": "nlp/spam_prediction/chatroom",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
