@@ -88,6 +88,11 @@
 					"script": "chatroom_spam_prediction", "path": "nlp/spam_prediction/chatroom",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
+				},
+				{
+					"script": "named_entity_recognition", "path": "nlp/named_entity_recognition",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
 				}
 			]
 		}
