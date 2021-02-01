@@ -53,7 +53,7 @@
          *
          * @var string
          */
-        public string $description = "Predicts spam from the given input (For Chatroom content)";
+        public string $description = "Predicts if the message from a chatroom contains spam or not";
 
         /**
          * Optional access record for this module

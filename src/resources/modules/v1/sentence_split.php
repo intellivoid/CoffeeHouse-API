@@ -47,7 +47,7 @@
          *
          * @var string
          */
-        public string $description = "Splits the input into sentences";
+        public string $description = "Splits the given input into sentences";
 
         /**
          * Optional access record for this module
