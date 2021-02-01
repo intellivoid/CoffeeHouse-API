@@ -597,6 +597,13 @@
             return true;
         }
 
+        /**
+         * Converts an alternative value to a standard array for the response
+         *
+         * @param string $alt_type
+         * @param $object
+         * @return array
+         */
         public function altTypeToStandardArray(string $alt_type, $object): array
         {
             switch($alt_type)
