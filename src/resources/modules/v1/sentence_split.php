@@ -1,11 +1,11 @@
 <?php
 
+    /** @noinspection PhpPureAttributeCanBeAddedInspection */
     /** @noinspection PhpUnused */
     /** @noinspection PhpMissingFieldTypeInspection */
 
     namespace modules\v1;
 
-    use CoffeeHouse\Classes\Utilities;
     use CoffeeHouse\CoffeeHouse;
     use CoffeeHouse\Exceptions\CoffeeHouseUtilsNotReadyException;
     use CoffeeHouse\Exceptions\InvalidInputException;
@@ -24,6 +24,7 @@
 
     /**
      * Class sentence_split
+     * @package modules\v1
      */
     class sentence_split extends Module implements Response
     {
@@ -32,28 +33,28 @@
          *
          * @var string
          */
-        public $name = "sentence_split";
+        public string $name = "sentence_split";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "1.0.0.0";
+        public string $version = "1.0.0.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Splits the input into sentences";
+        public string $description = "Splits the input into sentences";
 
         /**
          * Optional access record for this module
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
 
         /**
          * The content to give on the response

@@ -1,5 +1,6 @@
 <?php
 
+    /** @noinspection PhpPureAttributeCanBeAddedInspection */
     /** @noinspection PhpUnused */
     /** @noinspection PhpMissingFieldTypeInspection */
 
@@ -23,7 +24,8 @@
     include_once(__DIR__ . DIRECTORY_SEPARATOR . "script.supported_languages.php");
 
     /**
-     * Class create_lydia_session
+     * Class pos_tagging
+     * @package modules\v1
      */
     class pos_tagging extends Module implements Response
     {
@@ -32,28 +34,28 @@
          *
          * @var string
          */
-        public $name = "pos_tagging";
+        public string $name = "pos_tagging";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "1.0.0.0";
+        public string $version = "1.0.0.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Tags Part-Of-Speech entities from a text input";
+        public string $description = "Tags Part-Of-Speech entities from a text input";
 
         /**
          * Optional access record for this module
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
 
         /**
          * The content to give on the response

@@ -1,5 +1,10 @@
 <?php
 
+    /**
+     * Returns the supported language that this API currently supports
+     *
+     * @return string[]
+     */
     function get_supported_languages(): array
     {
         return [

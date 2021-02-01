@@ -1,5 +1,9 @@
 <?php
 
+    /** @noinspection PhpPureAttributeCanBeAddedInspection */
+    /** @noinspection PhpUnused */
+    /** @noinspection PhpMissingFieldTypeInspection */
+
     namespace modules\v1;
 
     use CoffeeHouse\Bots\Cleverbot;
@@ -19,6 +23,7 @@
 
     /**
      * Class create_lydia_session
+     * @package modules\v1
      */
     class create_lydia_session extends Module implements Response
     {
@@ -27,42 +32,42 @@
          *
          * @var string
          */
-        public $name = "create_lydia_session";
+        public string $name = "create_lydia_session";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "1.0.2.0";
+        public string $version = "1.0.2.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Creates a new Lydia chat session";
+        public string $description = "Creates a new chat session for Lydia";
 
         /**
          * Optional access record for this module
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
 
         /**
          * The content to give on the response
          *
          * @var string
          */
-        private $response_content;
+        private string $response_content;
 
         /**
          * The HTTP response code that will be given to the client
          *
          * @var int
          */
-        private $response_code = 200;
+        private int $response_code = 200;
 
         /**
          * @inheritDoc

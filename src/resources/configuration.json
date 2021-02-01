@@ -93,6 +93,11 @@
 					"script": "named_entity_recognition", "path": "nlp/named_entity_recognition",
 					"available": true, "authentication_required": true,
 					"unavailable_message": "This module is not available at the moment"
+				},
+				{
+					"script": "sentence_split", "path": "nlp/sentence_split",
+					"available": true, "authentication_required": true,
+					"unavailable_message": "This module is not available at the moment"
 				}
 			]
 		}

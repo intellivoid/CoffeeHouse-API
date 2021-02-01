@@ -1,4 +1,8 @@
-<?php /** @noinspection PhpMissingFieldTypeInspection */
+<?php
+
+    /** @noinspection PhpPureAttributeCanBeAddedInspection */
+    /** @noinspection PhpUnused */
+    /** @noinspection PhpMissingFieldTypeInspection */
 
     namespace modules\v1;
 
@@ -18,6 +22,7 @@
 
     /**
      * Class lydia_think_thought
+     * @package modules\v1
      */
     class lydia_think_thought extends Module implements  Response
     {
@@ -26,28 +31,28 @@
          *
          * @var string
          */
-        public $name = "lydia_think_thought";
+        public string $name = "lydia_think_thought";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "2.0.0.0";
+        public string $version = "2.0.0.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Invokes the AI to process a input and produce an output";
+        public string $description = "Invokes the AI to process a input and produce an output";
 
         /**
          * Optional access record for this module
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
 
         /**
          * The content to give on the response

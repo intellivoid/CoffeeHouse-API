@@ -17,26 +17,26 @@
          *
          * @var string
          */
-        public $name;
+        public string $name;
 
         /**
          * The description of the module
          *
          * @var string
          */
-        public $description;
+        public string $description;
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version;
+        public string $version;
 
         /**
          * Optional access record object, null =  not set
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
     }

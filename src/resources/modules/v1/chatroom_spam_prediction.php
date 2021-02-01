@@ -1,5 +1,6 @@
 <?php
 
+    /** @noinspection PhpPureAttributeCanBeAddedInspection */
     /** @noinspection PhpUnused */
     /** @noinspection PhpMissingFieldTypeInspection */
 
@@ -29,6 +30,7 @@
 
     /**
      * Class chatroom_spam_prediction
+     * @package modules\v1
      */
     class chatroom_spam_prediction extends Module implements Response
     {
@@ -37,28 +39,28 @@
          *
          * @var string
          */
-        public $name = "chatroom_spam_prediction";
+        public string $name = "chatroom_spam_prediction";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "1.0.0.0";
+        public string $version = "1.0.0.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Predicts spam from the given input (For chatrooms)";
+        public string $description = "Predicts spam from the given input (For Chatroom content)";
 
         /**
          * Optional access record for this module
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
 
         /**
          * The content to give on the response
@@ -222,6 +224,188 @@
             }
 
             return True;
+        }
+
+
+        /**
+         * @param CoffeeHouse $coffeeHouse
+         * @return LargeGeneralization|null
+         * @throws DatabaseException
+         * @throws InvalidSearchMethodException
+         * @throws NoResultsFoundException
+         * @throws Exception
+         * @noinspection DuplicatedCode
+         */
+        public function processGeneralization(CoffeeHouse $coffeeHouse): ?LargeGeneralization
+        {
+            $Parameters = Handler::getParameters(true, true);
+
+            // Check if the client is requesting for generalization
+            if(isset($Parameters["generalize"]))
+            {
+                if((bool)$Parameters["generalize"] == False)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+
+            if(isset($Parameters["generalization_id"]))
+            {
+                try
+                {
+                    $large_generalization = $coffeeHouse->getLargeGeneralizedClassificationManager()->get(LargeGeneralizedClassificationSearchMethod::byPublicID, $Parameters["generalization_id"]);
+                }
+                catch (NoResultsFoundException)
+                {
+                    $ResponsePayload = array(
+                        "success" => false,
+                        "response_code" => 404,
+                        "error" => array(
+                            "error_code" => 18,
+                            "type" => "CLIENT",
+                            "message" => "The requested generalization data was not found"
+                        )
+                    );
+                    $this->response_content = json_encode($ResponsePayload);
+                    $this->response_code = (int)$ResponsePayload["response_code"];
+
+                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                }
+                catch(Exception)
+                {
+                    $ResponsePayload = array(
+                        "success" => false,
+                        "response_code" => 500,
+                        "error" => array(
+                            "error_code" => -1,
+                            "type" => "SERVER",
+                            "message" => "There was an unexpected error while trying to retrieve the generalization data from the server"
+                        )
+                    );
+                    $this->response_content = json_encode($ResponsePayload);
+                    $this->response_code = (int)$ResponsePayload["response_code"];
+
+                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                }
+
+                // Verify if this generalization is applicable to this method
+
+                $labels = [];
+                $applicable_labels = [
+                    "ham",
+                    "spam"
+                ];
+
+                /** @noinspection DuplicatedCode */
+                foreach($large_generalization->Probabilities as $probability)
+                {
+                    if(in_array($probability->Label, $labels) == false)
+                        $labels[] = $probability->Label;
+                }
+
+                foreach($labels as $label)
+                {
+                    if(in_array($label, $applicable_labels) == false)
+                    {
+                        $ResponsePayload = array(
+                            "success" => false,
+                            "response_code" => 400,
+                            "error" => array(
+                                "error_code" => 19,
+                                "type" => "CLIENT",
+                                "message" => "This generalization set does not apply to this method"
+                            )
+                        );
+                        $this->response_content = json_encode($ResponsePayload);
+                        $this->response_code = (int)$ResponsePayload["response_code"];
+
+                        throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                    }
+                }
+
+                return $large_generalization;
+            }
+
+            if(isset($Parameters["generalization_size"]) == false)
+            {
+                $ResponsePayload = array(
+                    "success" => false,
+                    "response_code" => 400,
+                    "error" => array(
+                        "error_code" => 17,
+                        "type" => "SERVER",
+                        "message" => "Missing parameter 'generalization_size'"
+                    )
+                );
+                $this->response_content = json_encode($ResponsePayload);
+                $this->response_code = (int)$ResponsePayload["response_code"];
+
+                throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+            }
+            else
+            {
+                $GeneralizationSize = (int)$Parameters["generalization_size"];
+
+                if($GeneralizationSize <= 0)
+                {
+                    $ResponsePayload = array(
+                        "success" => false,
+                        "response_code" => 400,
+                        "error" => array(
+                            "error_code" => 15,
+                            "type" => "CLIENT",
+                            "message" => "The 'generalization_size' parameter cannot contain a value of 0 or negative"
+                        )
+                    );
+                    $this->response_content = json_encode($ResponsePayload);
+                    $this->response_code = (int)$ResponsePayload["response_code"];
+
+                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                }
+
+                // Set the current quota if it doesn't exist
+                if(isset($this->access_record->Variables["MAX_GENERALIZATION_SIZE"]) == false)
+                {
+                    $ResponsePayload = array(
+                        "success" => false,
+                        "response_code" => 500,
+                        "error" => array(
+                            "error_code" => -1,
+                            "type" => "SERVER",
+                            "message" => "The server cannot process the variable 'MAX_GENERALIZATION_SIZE'"
+                        )
+                    );
+                    $this->response_content = json_encode($ResponsePayload);
+                    $this->response_code = (int)$ResponsePayload["response_code"];
+
+                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                }
+
+                if($GeneralizationSize > (int)$this->access_record->Variables["MAX_GENERALIZATION_SIZE"])
+                {
+
+                    $ResponsePayload = array(
+                        "success" => false,
+                        "response_code" => 400,
+                        "error" => [
+                            "error_code" => 16,
+                            "type" => "CLIENT",
+                            "message" => "You cannot exceed a generalization size of '" . $this->access_record->Variables["MAX_GENERALIZATION_SIZE"] . "' (Subscription restriction)"
+                        ]
+                    );
+                    $this->response_content = json_encode($ResponsePayload);
+                    $this->response_code = (int)$ResponsePayload["response_code"];
+
+                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                }
+
+                $large_generalization = $coffeeHouse->getLargeGeneralizedClassificationManager()->create($GeneralizationSize);
+                return $large_generalization;
+            }
         }
 
         /**
@@ -594,187 +778,6 @@
             $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "spam_checks", $this->access_record->ID);
 
             return true;
-        }
-
-        /**
-         * @param CoffeeHouse $coffeeHouse
-         * @return LargeGeneralization|null
-         * @throws DatabaseException
-         * @throws InvalidSearchMethodException
-         * @throws NoResultsFoundException
-         * @throws Exception
-         * @noinspection DuplicatedCode
-         */
-        public function processGeneralization(CoffeeHouse $coffeeHouse): ?LargeGeneralization
-        {
-            $Parameters = Handler::getParameters(true, true);
-
-            // Check if the client is requesting for generalization
-            if(isset($Parameters["generalize"]))
-            {
-                if((bool)$Parameters["generalize"] == False)
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                return null;
-            }
-
-            if(isset($Parameters["generalization_id"]))
-            {
-                try
-                {
-                    $large_generalization = $coffeeHouse->getLargeGeneralizedClassificationManager()->get(LargeGeneralizedClassificationSearchMethod::byPublicID, $Parameters["generalization_id"]);
-                }
-                catch (NoResultsFoundException)
-                {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 404,
-                        "error" => array(
-                            "error_code" => 18,
-                            "type" => "CLIENT",
-                            "message" => "The requested generalization data was not found"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                }
-                catch(Exception)
-                {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 500,
-                        "error" => array(
-                            "error_code" => -1,
-                            "type" => "SERVER",
-                            "message" => "There was an unexpected error while trying to retrieve the generalization data from the server"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                }
-
-                // Verify if this generalization is applicable to this method
-
-                $labels = [];
-                $applicable_labels = [
-                    "ham",
-                    "spam"
-                ];
-
-                /** @noinspection DuplicatedCode */
-                foreach($large_generalization->Probabilities as $probability)
-                {
-                    if(in_array($probability->Label, $labels) == false)
-                        $labels[] = $probability->Label;
-                }
-
-                foreach($labels as $label)
-                {
-                    if(in_array($label, $applicable_labels) == false)
-                    {
-                        $ResponsePayload = array(
-                            "success" => false,
-                            "response_code" => 400,
-                            "error" => array(
-                                "error_code" => 19,
-                                "type" => "CLIENT",
-                                "message" => "This generalization set does not apply to this method"
-                            )
-                        );
-                        $this->response_content = json_encode($ResponsePayload);
-                        $this->response_code = (int)$ResponsePayload["response_code"];
-
-                        throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                    }
-                }
-
-                return $large_generalization;
-            }
-
-            if(isset($Parameters["generalization_size"]) == false)
-            {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 17,
-                        "type" => "SERVER",
-                        "message" => "Missing parameter 'generalization_size'"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-            }
-            else
-            {
-                $GeneralizationSize = (int)$Parameters["generalization_size"];
-
-                if($GeneralizationSize <= 0)
-                {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 400,
-                        "error" => array(
-                            "error_code" => 15,
-                            "type" => "CLIENT",
-                            "message" => "The 'generalization_size' parameter cannot contain a value of 0 or negative"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                }
-
-                // Set the current quota if it doesn't exist
-                if(isset($this->access_record->Variables["MAX_GENERALIZATION_SIZE"]) == false)
-                {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 500,
-                        "error" => array(
-                            "error_code" => -1,
-                            "type" => "SERVER",
-                            "message" => "The server cannot process the variable 'MAX_GENERALIZATION_SIZE'"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                }
-
-                if($GeneralizationSize > (int)$this->access_record->Variables["MAX_GENERALIZATION_SIZE"])
-                {
-
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 400,
-                        "error" => [
-                            "error_code" => 16,
-                            "type" => "CLIENT",
-                            "message" => "You cannot exceed a generalization size of '" . $this->access_record->Variables["MAX_GENERALIZATION_SIZE"] . "' (Subscription restriction)"
-                        ]
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                }
-
-                $large_generalization = $coffeeHouse->getLargeGeneralizedClassificationManager()->create($GeneralizationSize);
-                return $large_generalization;
-            }
         }
 
     }

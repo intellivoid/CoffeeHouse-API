@@ -1,5 +1,9 @@
 <?php
 
+    /** @noinspection PhpPureAttributeCanBeAddedInspection */
+    /** @noinspection PhpUnused */
+    /** @noinspection PhpMissingFieldTypeInspection */
+
     namespace modules\v1;
 
     use CoffeeHouse\Abstracts\LargeGeneralizedClassificationSearchMethod;
@@ -23,7 +27,8 @@
     include_once(__DIR__ . DIRECTORY_SEPARATOR . "script.check_subscription.php");
 
     /**
-     * Class create_lydia_session
+     * Class nsfw_classification
+     * @package modules\v1
      */
     class nsfw_classification extends Module implements Response
     {
@@ -32,28 +37,28 @@
          *
          * @var string
          */
-        public $name = "nsfw_classification";
+        public string $name = "nsfw_classification";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "1.0.0.0";
+        public string $version = "1.0.0.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Classifies an image to be NSFW or SFW";
+        public string $description = "Processes an image to determine if it classifies as NSFW content";
 
         /**
          * Optional access record for this module
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
 
         /**
          * The content to give on the response
@@ -153,221 +158,6 @@
             }
 
             return True;
-        }
-
-        /**
-         * @inheritDoc
-         * @noinspection DuplicatedCode
-         */
-        public function processRequest()
-        {
-            $CoffeeHouse = new CoffeeHouse();
-
-            // Import the check subscription script and execute it
-            $SubscriptionValidation = new SubscriptionValidation();
-
-            try
-            {
-                $ValidationResponse = $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $this->access_record);
-            }
-            catch (Exception $e)
-            {
-                InternalServerError::executeResponse($e);
-                exit();
-            }
-
-            if(is_null($ValidationResponse) == false)
-            {
-                $this->response_content = json_encode($ValidationResponse["response"]);
-                $this->response_code = $ValidationResponse["response_code"];
-
-                return null;
-            }
-
-            if($this->processQuota() == false)
-            {
-                return null;
-            }
-
-            $image_content = null;
-
-            try
-            {
-                $image_content = $this->checkUpload();
-            }
-            catch(RuntimeException $e)
-            {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => null,
-                    "error" => array(
-                        "error_code" => null,
-                        "type" => "CLIENT",
-                        "message" => null
-                    )
-                );
-
-                switch($e->getCode())
-                {
-                    case 51:
-                        $ResponsePayload["response_code"] = 413;
-                        $ResponsePayload["error"]["error_code"] = 9;
-                        $ResponsePayload["error"]["message"] = "File content too large";
-
-                        $this->response_content = json_encode($ResponsePayload);
-                        $this->response_code = (int)$ResponsePayload["response_code"];
-
-                        return false;
-
-                    case 52:
-                        $ResponsePayload["response_code"] = 500;
-                        $ResponsePayload["error"]["error_code"] = 10;
-                        $ResponsePayload["error"]["message"] = "File upload error";
-
-                        $this->response_content = json_encode($ResponsePayload);
-                        $this->response_code = (int)$ResponsePayload["response_code"];
-
-                        return false;
-
-                    default:
-                        break;
-                }
-            }
-
-            if($image_content == null)
-            {
-                try
-                {
-                    $image_content = $this->checkBase64Field();
-                }
-                catch(RuntimeException $e)
-                {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => null,
-                        "error" => array(
-                            "error_code" => null,
-                            "type" => "CLIENT",
-                            "message" => null
-                        )
-                    );
-
-                    switch($e->getCode())
-                    {
-                        case 51:
-                            $ResponsePayload["response_code"] = 413;
-                            $ResponsePayload["error"]["error_code"] = 9;
-                            $ResponsePayload["error"]["message"] = "File content too large";
-
-                            $this->response_content = json_encode($ResponsePayload);
-                            $this->response_code = (int)$ResponsePayload["response_code"];
-
-                            return false;
-
-                        case 52:
-                            $ResponsePayload["response_code"] = 500;
-                            $ResponsePayload["error"]["error_code"] = 10;
-                            $ResponsePayload["error"]["message"] = "File upload error";
-
-                            $this->response_content = json_encode($ResponsePayload);
-                            $this->response_code = (int)$ResponsePayload["response_code"];
-
-                            return false;
-
-                        case 53:
-                            $ResponsePayload["response_code"] = 400;
-                            $ResponsePayload["error"]["error_code"] = 11;
-                            $ResponsePayload["error"]["message"] = "Invalid base64 data";
-
-                            $this->response_content = json_encode($ResponsePayload);
-                            $this->response_code = (int)$ResponsePayload["response_code"];
-
-                            return false;
-
-                        default:
-                            break;
-                    }
-                }
-            }
-
-
-            if($image_content == null)
-            {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 14,
-                        "type" => "CLIENT",
-                        "message" => "Missing file upload or data field 'image'"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                return false;
-            }
-
-
-            try
-            {
-                $classificationResults = $this->processClassification($CoffeeHouse, $image_content);
-            }
-            catch(Exception)
-            {
-                // The request failed, already responded.
-                return false;
-            }
-
-            try
-            {
-                $generalization = $this->processGeneralization($CoffeeHouse);
-
-                if($generalization !== null)
-                {
-                    $generalization = $CoffeeHouse->getNsfwClassification()->generalize($generalization, $classificationResults);
-
-                    // Pre-calculate the probabilities
-                    $generalization->TopProbability = $generalization->TopProbability * 100;
-
-                    $probabilities_data = array();
-
-                    foreach ($generalization->Probabilities as $probability)
-                    {
-                        $probabilities_set = [];
-                        foreach($probability->Probabilities as $f) $probabilities_set[] = $f * 100;
-
-                        $probabilities_data[] = [
-                            "label" => $probability->Label,
-                            "calculated_probability" => $probability->CalculatedProbability * 100,
-                            "current_pointer" => $probability->CurrentPointer - 1,
-                            "probabilities" => $probabilities_set
-                        ];
-                    }
-
-                    $ResponsePayload = json_decode($this->response_content, true);
-                    $ResponsePayload["results"]["generalization"] = [
-                        "id" => $generalization->PublicID,
-                        "size" => $generalization->MaxProbabilitiesSize,
-                        "top_label" => $generalization->TopLabel,
-                        "top_probability" => $generalization->TopProbability,
-                        "probabilities" => $probabilities_data
-                    ];
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-                }
-            }
-            catch(Exception)
-            {
-                // The request failed, already responded.
-                return false;
-            }
-
-            $this->access_record->Variables["NFW_CHECKS"] += 1;
-            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "nsfw_classifications", 0);
-            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "nsfw_classifications", $this->access_record->ID);
-
-            return true;
         }
 
         /**
@@ -727,5 +517,220 @@
             }
 
             return $_FILES["image"]["tmp_name"];
+        }
+
+        /**
+         * @inheritDoc
+         * @noinspection DuplicatedCode
+         */
+        public function processRequest()
+        {
+            $CoffeeHouse = new CoffeeHouse();
+
+            // Import the check subscription script and execute it
+            $SubscriptionValidation = new SubscriptionValidation();
+
+            try
+            {
+                $ValidationResponse = $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $this->access_record);
+            }
+            catch (Exception $e)
+            {
+                InternalServerError::executeResponse($e);
+                exit();
+            }
+
+            if(is_null($ValidationResponse) == false)
+            {
+                $this->response_content = json_encode($ValidationResponse["response"]);
+                $this->response_code = $ValidationResponse["response_code"];
+
+                return null;
+            }
+
+            if($this->processQuota() == false)
+            {
+                return null;
+            }
+
+            $image_content = null;
+
+            try
+            {
+                $image_content = $this->checkUpload();
+            }
+            catch(RuntimeException $e)
+            {
+                $ResponsePayload = array(
+                    "success" => false,
+                    "response_code" => null,
+                    "error" => array(
+                        "error_code" => null,
+                        "type" => "CLIENT",
+                        "message" => null
+                    )
+                );
+
+                switch($e->getCode())
+                {
+                    case 51:
+                        $ResponsePayload["response_code"] = 413;
+                        $ResponsePayload["error"]["error_code"] = 9;
+                        $ResponsePayload["error"]["message"] = "File content too large";
+
+                        $this->response_content = json_encode($ResponsePayload);
+                        $this->response_code = (int)$ResponsePayload["response_code"];
+
+                        return false;
+
+                    case 52:
+                        $ResponsePayload["response_code"] = 500;
+                        $ResponsePayload["error"]["error_code"] = 10;
+                        $ResponsePayload["error"]["message"] = "File upload error";
+
+                        $this->response_content = json_encode($ResponsePayload);
+                        $this->response_code = (int)$ResponsePayload["response_code"];
+
+                        return false;
+
+                    default:
+                        break;
+                }
+            }
+
+            if($image_content == null)
+            {
+                try
+                {
+                    $image_content = $this->checkBase64Field();
+                }
+                catch(RuntimeException $e)
+                {
+                    $ResponsePayload = array(
+                        "success" => false,
+                        "response_code" => null,
+                        "error" => array(
+                            "error_code" => null,
+                            "type" => "CLIENT",
+                            "message" => null
+                        )
+                    );
+
+                    switch($e->getCode())
+                    {
+                        case 51:
+                            $ResponsePayload["response_code"] = 413;
+                            $ResponsePayload["error"]["error_code"] = 9;
+                            $ResponsePayload["error"]["message"] = "File content too large";
+
+                            $this->response_content = json_encode($ResponsePayload);
+                            $this->response_code = (int)$ResponsePayload["response_code"];
+
+                            return false;
+
+                        case 52:
+                            $ResponsePayload["response_code"] = 500;
+                            $ResponsePayload["error"]["error_code"] = 10;
+                            $ResponsePayload["error"]["message"] = "File upload error";
+
+                            $this->response_content = json_encode($ResponsePayload);
+                            $this->response_code = (int)$ResponsePayload["response_code"];
+
+                            return false;
+
+                        case 53:
+                            $ResponsePayload["response_code"] = 400;
+                            $ResponsePayload["error"]["error_code"] = 11;
+                            $ResponsePayload["error"]["message"] = "Invalid base64 data";
+
+                            $this->response_content = json_encode($ResponsePayload);
+                            $this->response_code = (int)$ResponsePayload["response_code"];
+
+                            return false;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+
+
+            if($image_content == null)
+            {
+                $ResponsePayload = array(
+                    "success" => false,
+                    "response_code" => 400,
+                    "error" => array(
+                        "error_code" => 14,
+                        "type" => "CLIENT",
+                        "message" => "Missing file upload or data field 'image'"
+                    )
+                );
+                $this->response_content = json_encode($ResponsePayload);
+                $this->response_code = (int)$ResponsePayload["response_code"];
+
+                return false;
+            }
+
+
+            try
+            {
+                $classificationResults = $this->processClassification($CoffeeHouse, $image_content);
+            }
+            catch(Exception)
+            {
+                // The request failed, already responded.
+                return false;
+            }
+
+            try
+            {
+                $generalization = $this->processGeneralization($CoffeeHouse);
+
+                if($generalization !== null)
+                {
+                    $generalization = $CoffeeHouse->getNsfwClassification()->generalize($generalization, $classificationResults);
+
+                    // Pre-calculate the probabilities
+                    $generalization->TopProbability = $generalization->TopProbability * 100;
+
+                    $probabilities_data = array();
+
+                    foreach ($generalization->Probabilities as $probability)
+                    {
+                        $probabilities_set = [];
+                        foreach($probability->Probabilities as $f) $probabilities_set[] = $f * 100;
+
+                        $probabilities_data[] = [
+                            "label" => $probability->Label,
+                            "calculated_probability" => $probability->CalculatedProbability * 100,
+                            "current_pointer" => $probability->CurrentPointer - 1,
+                            "probabilities" => $probabilities_set
+                        ];
+                    }
+
+                    $ResponsePayload = json_decode($this->response_content, true);
+                    $ResponsePayload["results"]["generalization"] = [
+                        "id" => $generalization->PublicID,
+                        "size" => $generalization->MaxProbabilitiesSize,
+                        "top_label" => $generalization->TopLabel,
+                        "top_probability" => $generalization->TopProbability,
+                        "probabilities" => $probabilities_data
+                    ];
+                    $this->response_content = json_encode($ResponsePayload);
+                    $this->response_code = (int)$ResponsePayload["response_code"];
+                }
+            }
+            catch(Exception)
+            {
+                // The request failed, already responded.
+                return false;
+            }
+
+            $this->access_record->Variables["NFW_CHECKS"] += 1;
+            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "nsfw_classifications", 0);
+            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "nsfw_classifications", $this->access_record->ID);
+
+            return true;
         }
     }

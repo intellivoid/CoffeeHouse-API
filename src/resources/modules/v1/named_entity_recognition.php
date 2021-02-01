@@ -1,5 +1,6 @@
 <?php
 
+    /** @noinspection PhpPureAttributeCanBeAddedInspection */
     /** @noinspection PhpUnused */
     /** @noinspection PhpMissingFieldTypeInspection */
 
@@ -30,6 +31,7 @@
 
     /**
      * Class named_entity_recognition
+     * @package modules\v1
      */
     class named_entity_recognition extends Module implements Response
     {
@@ -38,28 +40,28 @@
          *
          * @var string
          */
-        public $name = "named_entity_recognition";
+        public string $name = "named_entity_recognition";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "1.0.0.0";
+        public string $version = "1.0.0.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Detects named entities from the given input";
+        public string $description = "Detects named entities from the given input";
 
         /**
          * Optional access record for this module
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
 
         /**
          * The content to give on the response
@@ -167,6 +169,7 @@
          *
          * @param string $input
          * @return bool
+         * @noinspection DuplicatedCode
          */
         private function validateNlpInput(string $input): bool
         {
@@ -222,6 +225,82 @@
             }
 
             return True;
+        }
+
+        /**
+         * Converts an alternative value to a standard array for the response
+         *
+         * @param string $alt_type
+         * @param $object
+         * @return array
+         */
+        public function altTypeToStandardArray(string $alt_type, $object): array
+        {
+            switch($alt_type)
+            {
+                case NamedEntityAlternativeValueTypes::Duration:
+                    /** @var Duration $duration */
+                    $duration = $object;
+
+                    return [
+                        "type" => NamedEntityAlternativeValueTypes::Duration,
+                        "duration" => [
+                            "duration_type" => $duration->DurationType,
+                            "value_unit" => $duration->ValueType,
+                            "value" => $duration->Value
+                        ]
+                    ];
+
+                case NamedEntityAlternativeValueTypes::Date:
+                    /** @var DateType $date */
+                    $date = $object;
+
+                    return [
+                        "type" => NamedEntityAlternativeValueTypes::Date,
+                        "date" => [
+                            "day" => $date->Day,
+                            "month" => $date->Month,
+                            "year" => $date->Year
+                        ]
+                    ];
+
+                case NamedEntityAlternativeValueTypes::DateTime:
+                    /** @var DateTimeType $date_time */
+                    $date_time = $object;
+
+                    return [
+                        "type" => NamedEntityAlternativeValueTypes::DateTime,
+                        "date" => [
+                            "day" => $date_time->DateType->Day,
+                            "month" => $date_time->DateType->Month,
+                            "year" => $date_time->DateType->Year
+                        ],
+                        "time" => [
+                            "hour"  => $date_time->TimeType->Hour,
+                            "minute"  => $date_time->TimeType->Minute,
+                            "seconds"  => $date_time->TimeType->Seconds
+                        ]
+                    ];
+
+                case NamedEntityAlternativeValueTypes::Time:
+                    /** @var TimeType $time = */
+                    $time = $object;
+
+                    return [
+                        "type" => NamedEntityAlternativeValueTypes::Time,
+                        "time" => [
+                            "hour"  => $time->Hour,
+                            "minute"  => $time->Minute,
+                            "seconds"  => $time->Seconds
+                        ]
+                    ];
+
+                default:
+                case NamedEntityAlternativeValueTypes::None:
+                    return [
+                        "type" => NamedEntityAlternativeValueTypes::None
+                    ];
+            }
         }
 
         /**
@@ -595,81 +674,5 @@
             $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "ner_checks", $this->access_record->ID);
 
             return true;
-        }
-
-        /**
-         * Converts an alternative value to a standard array for the response
-         *
-         * @param string $alt_type
-         * @param $object
-         * @return array
-         */
-        public function altTypeToStandardArray(string $alt_type, $object): array
-        {
-            switch($alt_type)
-            {
-                case NamedEntityAlternativeValueTypes::Duration:
-                    /** @var Duration $duration */
-                    $duration = $object;
-
-                    return [
-                        "type" => NamedEntityAlternativeValueTypes::Duration,
-                        "duration" => [
-                            "duration_type" => $duration->DurationType,
-                            "value_unit" => $duration->ValueType,
-                            "value" => $duration->Value
-                        ]
-                    ];
-
-                case NamedEntityAlternativeValueTypes::Date:
-                    /** @var DateType $date */
-                    $date = $object;
-
-                    return [
-                        "type" => NamedEntityAlternativeValueTypes::Date,
-                        "date" => [
-                            "day" => $date->Day,
-                            "month" => $date->Month,
-                            "year" => $date->Year
-                        ]
-                    ];
-
-                case NamedEntityAlternativeValueTypes::DateTime:
-                    /** @var DateTimeType $date_time */
-                    $date_time = $object;
-
-                    return [
-                        "type" => NamedEntityAlternativeValueTypes::DateTime,
-                        "date" => [
-                            "day" => $date_time->DateType->Day,
-                            "month" => $date_time->DateType->Month,
-                            "year" => $date_time->DateType->Year
-                        ],
-                        "time" => [
-                            "hour"  => $date_time->TimeType->Hour,
-                            "minute"  => $date_time->TimeType->Minute,
-                            "seconds"  => $date_time->TimeType->Seconds
-                        ]
-                    ];
-
-                case NamedEntityAlternativeValueTypes::Time:
-                    /** @var TimeType $time = */
-                    $time = $object;
-
-                    return [
-                        "type" => NamedEntityAlternativeValueTypes::Time,
-                        "time" => [
-                            "hour"  => $time->Hour,
-                            "minute"  => $time->Minute,
-                            "seconds"  => $time->Seconds
-                        ]
-                    ];
-
-                default:
-                case NamedEntityAlternativeValueTypes::None:
-                    return [
-                        "type" => NamedEntityAlternativeValueTypes::None
-                    ];
-            }
         }
     }

@@ -1,4 +1,8 @@
-<?php /** @noinspection PhpMissingFieldTypeInspection */
+<?php
+
+    /** @noinspection PhpPureAttributeCanBeAddedInspection */
+    /** @noinspection PhpUnused */
+    /** @noinspection PhpMissingFieldTypeInspection */
 
     namespace modules\v1;
 
@@ -17,6 +21,7 @@
 
     /**
      * Class get_lydia_session
+     * @package modules\v1
      */
     class get_lydia_session extends Module implements  Response
     {
@@ -25,28 +30,28 @@
          *
          * @var string
          */
-        public $name = "get_lydia_session";
+        public string $name = "get_lydia_session";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "1.0.2.0";
+        public string $version = "1.0.2.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Gets an existing Lydia Session";
+        public string $description = "Gets an existing Lydia Session";
 
         /**
          * Optional access record for this module
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
 
         /**
          * The content to give on the response
@@ -165,7 +170,7 @@
                     ForeignSessionSearchMethod::bySessionId, $Parameters["session_id"]
                 );
             }
-            catch (ForeignSessionNotFoundException $e)
+            catch (ForeignSessionNotFoundException)
             {
                 $ResponsePayload = array(
                     "success" => false,

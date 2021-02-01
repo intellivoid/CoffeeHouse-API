@@ -1,5 +1,6 @@
 <?php
 
+    /** @noinspection PhpPureAttributeCanBeAddedInspection */
     /** @noinspection PhpUnused */
     /** @noinspection PhpMissingFieldTypeInspection */
 
@@ -28,8 +29,10 @@
     include_once(__DIR__ . DIRECTORY_SEPARATOR . "script.check_subscription.php");
     include_once(__DIR__ . DIRECTORY_SEPARATOR . "script.supported_languages.php");
 
+
     /**
-     * Class create_lydia_session
+     * Class emotion_analysis
+     * @package modules\v1
      */
     class emotion_analysis extends Module implements Response
     {
@@ -38,28 +41,28 @@
          *
          * @var string
          */
-        public $name = "emotion_analysis";
+        public string $name = "emotion_analysis";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "1.0.0.0";
+        public string $version = "1.0.0.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Predicts emotion values from the given input";
+        public string $description = "Predicts emotion values from the given input";
 
         /**
          * Optional access record for this module
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
 
         /**
          * The content to give on the response
@@ -546,6 +549,7 @@
          * @throws InvalidSearchMethodException
          * @throws NoResultsFoundException
          * @throws Exception
+         * @noinspection DuplicatedCode
          */
         public function processGeneralization(CoffeeHouse $coffeeHouse): ?LargeGeneralization
         {

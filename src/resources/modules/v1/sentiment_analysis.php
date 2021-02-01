@@ -1,5 +1,6 @@
 <?php
 
+    /** @noinspection PhpPureAttributeCanBeAddedInspection */
     /** @noinspection PhpUnused */
     /** @noinspection PhpMissingFieldTypeInspection */
 
@@ -29,7 +30,8 @@
     include_once(__DIR__ . DIRECTORY_SEPARATOR . "script.supported_languages.php");
 
     /**
-     * Class create_lydia_session
+     * Class sentiment_analysis
+     * @package modules\v1
      */
     class sentiment_analysis extends Module implements Response
     {
@@ -38,28 +40,28 @@
          *
          * @var string
          */
-        public $name = "sentiment_analysis";
+        public string $name = "sentiment_analysis";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "1.0.0.0";
+        public string $version = "1.0.0.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Predicts sentimental values from the given input";
+        public string $description = "Predicts sentimental values from the given input";
 
         /**
          * Optional access record for this module
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
 
         /**
          * The content to give on the response

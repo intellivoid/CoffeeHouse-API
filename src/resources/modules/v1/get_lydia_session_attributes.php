@@ -1,4 +1,8 @@
-<?php /** @noinspection PhpMissingFieldTypeInspection */
+<?php
+
+    /** @noinspection PhpPureAttributeCanBeAddedInspection */
+    /** @noinspection PhpUnused */
+    /** @noinspection PhpMissingFieldTypeInspection */
 
     namespace modules\v1;
 
@@ -19,6 +23,7 @@
 
     /**
      * Class get_lydia_session_attributes
+     * @package modules\v1
      */
     class get_lydia_session_attributes extends Module implements  Response
     {
@@ -27,28 +32,28 @@
          *
          * @var string
          */
-        public $name = "get_lydia_session_attributes";
+        public string $name = "get_lydia_session_attributes";
 
         /**
          * The version of this module
          *
          * @var string
          */
-        public $version = "1.0.0.0";
+        public string $version = "1.0.0.0";
 
         /**
          * The description of this module
          *
          * @var string
          */
-        public $description = "Returns the attributes of an existing session";
+        public string $description = "Returns the attributes of an existing session";
 
         /**
          * Optional access record for this module
          *
          * @var AccessRecord
          */
-        public $access_record;
+        public AccessRecord $access_record;
 
         /**
          * The content to give on the response
@@ -167,7 +172,7 @@
                     ForeignSessionSearchMethod::bySessionId, $Parameters["session_id"]
                 );
             }
-            catch (ForeignSessionNotFoundException $e)
+            catch (ForeignSessionNotFoundException)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -235,9 +240,7 @@
                         "current_language_probability" => null
                     )
                 );
-
             }
-
 
             $this->response_content = json_encode($ResponsePayload);
             $this->response_code = (int)$ResponsePayload["response_code"];
