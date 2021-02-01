@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Intellivoid Technologies" pattern="file[CoffeeHouse-API]:src//*&amp;&amp;!file[CoffeeHouse-API]:.pki//*&amp;&amp;!file[CoffeeHouse-API]:.idea//*&amp;&amp;!file:.gitattributes&amp;&amp;!file:src/.htaccess&amp;&amp;!file:src/resources/configuration.json&amp;&amp;!file:src/resources/.htaccess&amp;&amp;!file:src/resources/Handler/handler.json" />
+</component>
