@@ -23,7 +23,8 @@
             "hi", // Hindi
             "hr", // Croatian
             "es", // Spanish
-            "ru" // Russian
+            "ru", // Russian
+            "it" // Italian
         ];
     }
 
