@@ -450,7 +450,7 @@
                     "text" => $emotionPredictionSentence->Text,
                     "offset_begin" => $emotionPredictionSentence->OffsetBegin,
                     "offset_end" => $emotionPredictionSentence->OffsetEnd,
-                    "sentiment" => [
+                    "emotion" => [
                         "emotion" => $emotionPredictionSentence->EmotionPredictionResults->TopEmotion,
                         "prediction" => $emotionPredictionSentence->EmotionPredictionResults->TopValue * 100,
                         "predictions" => $predictions
@@ -476,7 +476,7 @@
                     "results" => [
                         "text" => $EmotionResults->Text,
                         "source_language" => $source_language,
-                        "sentiment" => $SingularResults,
+                        "emotion" => $SingularResults,
                         "sentences" => $SentencesResults,
                         "generalization" => null
                     ]
@@ -490,7 +490,7 @@
                     "results" => [
                         "text" => $EmotionResults->Text,
                         "source_language" => $source_language,
-                        "sentiment" => $SingularResults,
+                        "emotion" => $SingularResults,
                         "generalization" => null
                     ]
                 );
