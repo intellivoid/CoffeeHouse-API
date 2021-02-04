@@ -781,8 +781,8 @@
             $this->response_code = (int)$ResponsePayload["response_code"];
 
             $this->access_record->Variables["SPAM_CHECKS"] += 1;
-            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "spam_checks", 0);
-            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "spam_checks", $this->access_record->ID);
+            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "chatroom_spam_checks", 0);
+            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "chatroom_spam_checks", $this->access_record->ID);
 
             return true;
         }
