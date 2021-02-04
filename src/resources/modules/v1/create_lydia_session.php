@@ -224,6 +224,31 @@
                 }
             }
 
+            if(isset($Parameters["language"]))
+            {
+                try
+                {
+                    $SelectedLanguage = Utilities::convertToISO6391($Parameters["language"]);
+                }
+                catch (InvalidLanguageException)
+                {
+                    $ResponsePayload = array(
+                        "success" => false,
+                        "response_code" => 400,
+                        "error" => array(
+                            "error_code" => 7,
+                            "type" => "CLIENT",
+                            "message" => "The given language code is not a valid ISO 639-1 Language Code"
+                        )
+                    );
+
+                    $this->response_content = json_encode($ResponsePayload);
+                    $this->response_code = (int)$ResponsePayload["response_code"];
+
+                    return null;
+                }
+            }
+
             try
             {
                 $CleverBot = new Cleverbot($CoffeeHouse);
