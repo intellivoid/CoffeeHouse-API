@@ -198,7 +198,7 @@
                 {
                     $large_generalization = $coffeeHouse->getLargeGeneralizedClassificationManager()->get(LargeGeneralizedClassificationSearchMethod::byPublicID, $Parameters["generalization_id"]);
                 }
-                catch (NoResultsFoundException)
+                catch (NoResultsFoundException $e)
                 {
                     $ResponsePayload = array(
                         "success" => false,
@@ -214,7 +214,7 @@
 
                     throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
                 }
-                catch(Exception)
+                catch(Exception $e)
                 {
                     $ResponsePayload = array(
                         "success" => false,
@@ -367,7 +367,7 @@
                         // Save disk-space
                         unlink($input);
                     }
-                    catch(Exception)
+                    catch(Exception $e)
                     {
                         // Do nothing!
                     }
@@ -399,7 +399,7 @@
 
                 return $results;
             }
-            catch (CoffeeHouseUtilsNotReadyException)
+            catch (CoffeeHouseUtilsNotReadyException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -416,7 +416,7 @@
                 throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
 
             }
-            catch (UnsupportedImageTypeException)
+            catch (UnsupportedImageTypeException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -432,7 +432,7 @@
 
                 throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
             }
-            catch(Exception)
+            catch(Exception $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -471,7 +471,7 @@
                 if($content == false)
                     throw new RuntimeException("Invalid base64 data", 53);
             }
-            catch(Exception)
+            catch(Exception $e)
             {
                 throw new RuntimeException("Invalid base64 data", 53);
             }
@@ -684,7 +684,7 @@
             {
                 $classificationResults = $this->processClassification($CoffeeHouse, $image_content);
             }
-            catch(Exception)
+            catch(Exception $e)
             {
                 // The request failed, already responded.
                 return false;
@@ -728,7 +728,7 @@
                     $this->response_code = (int)$ResponsePayload["response_code"];
                 }
             }
-            catch(Exception)
+            catch(Exception $e)
             {
                 // The request failed, already responded.
                 return false;

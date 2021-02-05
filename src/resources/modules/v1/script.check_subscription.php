@@ -67,7 +67,7 @@
                     UserSubscriptionSearchMethod::byAccessRecordID, $access_record->ID
                 );
             }
-            catch (UserSubscriptionNotFoundException)
+            catch (UserSubscriptionNotFoundException $e)
             {
                 return $this::buildResponse(array(
                     "success" => false,
@@ -100,7 +100,7 @@
                     SubscriptionSearchMethod::byId, $UserSubscription->SubscriptionID
                 );
             }
-            catch (SubscriptionNotFoundException)
+            catch (SubscriptionNotFoundException $e)
             {
                 return $this::buildResponse(array(
                     "success" => false,

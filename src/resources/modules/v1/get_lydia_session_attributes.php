@@ -179,7 +179,7 @@
                     ForeignSessionSearchMethod::bySessionId, $Parameters["session_id"]
                 );
             }
-            catch (ForeignSessionNotFoundException)
+            catch (ForeignSessionNotFoundException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -202,7 +202,7 @@
                     LocalSessionSearchMethod::ByForeignSessionId, $Session->ID
                 );
             }
-            catch (LocalSessionNotFoundException)
+            catch (LocalSessionNotFoundException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -235,7 +235,7 @@
                 );
 
             }
-            catch(Exception)
+            catch(Exception $e)
             {
                 $ResponsePayload = array(
                     "success" => true,

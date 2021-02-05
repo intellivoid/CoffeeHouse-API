@@ -212,7 +212,7 @@
             {
                 $CleverBot->loadSession($Parameters["session_id"]);
             }
-            catch(ForeignSessionNotFoundException)
+            catch(ForeignSessionNotFoundException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -272,7 +272,7 @@
             {
                 $BotResponse = $CleverBot->think($Parameters["input"]);
             }
-            catch(BotSessionException)
+            catch(BotSessionException $e)
             {
                 $Session = $CleverBot->getSession();
                 $Session->Available = false;

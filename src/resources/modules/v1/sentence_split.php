@@ -287,7 +287,7 @@
             {
                 $SentenceSplitResults = $CoffeeHouse->getCoreNLP()->sentenceSplit($Parameters["input"]);
             }
-            catch (CoffeeHouseUtilsNotReadyException)
+            catch (CoffeeHouseUtilsNotReadyException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -303,7 +303,7 @@
 
                 return false;
             }
-            catch (InvalidInputException | InvalidTextInputException | InvalidLanguageException)
+            catch (InvalidInputException | InvalidTextInputException | InvalidLanguageException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -319,7 +319,7 @@
 
                 return false;
             }
-            catch(Exception)
+            catch(Exception $e)
             {
                 $ResponsePayload = array(
                     "success" => false,

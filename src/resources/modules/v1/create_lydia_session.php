@@ -205,7 +205,7 @@
                 {
                     $SelectedLanguage = Utilities::convertToISO6391($Parameters["target_language"]);
                 }
-                catch (InvalidLanguageException)
+                catch (InvalidLanguageException $e)
                 {
                     $ResponsePayload = array(
                         "success" => false,
@@ -230,7 +230,7 @@
                 {
                     $SelectedLanguage = Utilities::convertToISO6391($Parameters["language"]);
                 }
-                catch (InvalidLanguageException)
+                catch (InvalidLanguageException $e)
                 {
                     $ResponsePayload = array(
                         "success" => false,
@@ -256,7 +256,7 @@
 
                 $this->access_record->Variables["LYDIA_SESSIONS"] += 1;
             }
-            catch(BotSessionException)
+            catch(BotSessionException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,

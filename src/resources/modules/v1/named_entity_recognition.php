@@ -446,7 +446,7 @@
                         $language_prediction_results = $CoffeeHouse->getLanguagePrediction()->predict($Parameters["input"]);
                         $Parameters["language"] = $language_prediction_results->combineResults()[0]->Language;
                     }
-                    catch (CoffeeHouseUtilsNotReadyException)
+                    catch (CoffeeHouseUtilsNotReadyException $e)
                     {
                         $ResponsePayload = array(
                             "success" => false,
@@ -462,7 +462,7 @@
 
                         return false;
                     }
-                    catch(Exception)
+                    catch(Exception $e)
                     {
                         $ResponsePayload = array(
                             "success" => false,
@@ -484,7 +484,7 @@
                 {
                     $source_language = Utilities::convertToISO6391($Parameters["language"]);
                 }
-                catch (InvalidLanguageException)
+                catch (InvalidLanguageException $e)
                 {
                     $ResponsePayload = array(
                         "success" => false,
@@ -523,7 +523,7 @@
             {
                 $NerResults = $CoffeeHouse->getCoreNLP()->ner($Parameters["input"], $source_language);
             }
-            catch (CoffeeHouseUtilsNotReadyException)
+            catch (CoffeeHouseUtilsNotReadyException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -539,7 +539,7 @@
 
                 return false;
             }
-            catch (InvalidInputException | InvalidTextInputException | InvalidLanguageException)
+            catch (InvalidInputException | InvalidTextInputException | InvalidLanguageException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -555,7 +555,7 @@
 
                 return false;
             }
-            catch(Exception)
+            catch(Exception $e)
             {
                 $ResponsePayload = array(
                     "success" => false,

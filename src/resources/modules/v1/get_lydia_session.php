@@ -177,7 +177,7 @@
                     ForeignSessionSearchMethod::bySessionId, $Parameters["session_id"]
                 );
             }
-            catch (ForeignSessionNotFoundException)
+            catch (ForeignSessionNotFoundException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,

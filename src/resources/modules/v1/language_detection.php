@@ -264,7 +264,7 @@
                 {
                     $large_generalization = $coffeeHouse->getLargeGeneralizedClassificationManager()->get(LargeGeneralizedClassificationSearchMethod::byPublicID, $Parameters["generalization_id"]);
                 }
-                catch (NoResultsFoundException)
+                catch (NoResultsFoundException $e)
                 {
                     $ResponsePayload = array(
                         "success" => false,
@@ -280,7 +280,7 @@
 
                     throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
                 }
-                catch(Exception)
+                catch(Exception $e)
                 {
                     $ResponsePayload = array(
                         "success" => false,
@@ -505,7 +505,7 @@
                     $LanguageResults = $CoffeeHouse->getLanguagePrediction()->predict($Parameters["input"]);
                 }
             }
-            catch (CoffeeHouseUtilsNotReadyException)
+            catch (CoffeeHouseUtilsNotReadyException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -521,7 +521,7 @@
 
                 return false;
             }
-            catch (InvalidInputException | InvalidTextInputException | InvalidLanguageException)
+            catch (InvalidInputException | InvalidTextInputException | InvalidLanguageException $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -537,7 +537,7 @@
 
                 return false;
             }
-            catch(Exception)
+            catch(Exception $e)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -700,7 +700,7 @@
                     $this->response_code = (int)$ResponsePayload["response_code"];
                 }
             }
-            catch(Exception)
+            catch(Exception $e)
             {
                 // The request failed, already responded.
                 return false;
