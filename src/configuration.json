@@ -1,0 +1,20 @@
+{
+  "name": "CoffeeHouse API",
+  "configuration": {
+    "logging_enabled": true,
+    "root_path": "/coffeehouse",
+    "debugging_mode": false,
+    "framework_signature": true,
+    "api_signature": true,
+    "khm_enabled": true,
+    "firewall_deny": [],
+    "headers": {}
+  },
+  "versions": [
+    {
+      "version": "v1",
+      "enabled": true,
+      "methods": []
+    }
+  ]
+}

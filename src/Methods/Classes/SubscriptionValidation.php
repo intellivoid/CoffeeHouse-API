@@ -1,36 +1,8 @@
-<?php     /*
-     * Copyright (c) 2017-2021. Intellivoid Technologies
-     *
-     * All rights reserved, this is a closed-source solution written by Zi Xing Narrakas,
-     *  under no circumstances is any entity with access to this file should redistribute
-     *  without written permission from Intellivoid and or the original Author.
-     */ /** @noinspection PhpMissingFieldTypeInspection */
+<?php
 
-    use COASniffle\Exceptions\CoaAuthenticationException;
-    use COASniffle\Handlers\COA;
-    use CoffeeHouse\Abstracts\UserSubscriptionSearchMethod;
-    use CoffeeHouse\CoffeeHouse;
-    use CoffeeHouse\Exceptions\UserSubscriptionNotFoundException;
-    use CoffeeHouse\Objects\UserSubscription;
-    use Handler\GenericResponses\InternalServerError;
-    use Handler\Handler;
-    use IntellivoidAPI\Exceptions\AccessRecordNotFoundException;
-    use IntellivoidAPI\Exceptions\DatabaseException;
-    use IntellivoidAPI\Exceptions\InvalidRateLimitConfiguration;
-    use IntellivoidAPI\Exceptions\InvalidSearchMethodException;
-    use IntellivoidAPI\Objects\AccessRecord;
-    use IntellivoidSubscriptionManager\Abstracts\SearchMethods\SubscriptionSearchMethod;
-    use IntellivoidSubscriptionManager\Exceptions\SubscriptionNotFoundException;
-    use IntellivoidSubscriptionManager\IntellivoidSubscriptionManager;
-    use IntellivoidSubscriptionManager\Objects\Subscription;
-    use IntellivoidSubscriptionManager\Utilities\Converter;
 
-    /**
-     * This script gets executed by the main modules to determine if the subscription
-     * is active or not. This has been written by Zi Xing for IVA2.0 & COA
-     *
-     * Version 1.0.0.0
-     */
+    namespace Methods\Classes;
+
     class SubscriptionValidation
     {
         /**
@@ -73,11 +45,11 @@
                     "success" => false,
                     "response_code" => 500,
                     "error" => array(
-                            "error_code" => 0,
-                            "type" => "SUBSCRIPTION",
-                            "message" => "There was an error while trying to verify your subscription, the system couldn't find your subscription."
-                        )
-                    ),
+                        "error_code" => 0,
+                        "type" => "SUBSCRIPTION",
+                        "message" => "There was an error while trying to verify your subscription, the system couldn't find your subscription."
+                    )
+                ),
                     500,
                     array(
                         "access_record" => $access_record->toArray()
@@ -106,11 +78,11 @@
                     "success" => false,
                     "response_code" => 403,
                     "error" => array(
-                            "error_code" => 0,
-                            "type" => "SUBSCRIPTION",
-                            "message" => "You do not have an active subscription with this service"
-                        )
-                    ),
+                        "error_code" => 0,
+                        "type" => "SUBSCRIPTION",
+                        "message" => "You do not have an active subscription with this service"
+                    )
+                ),
                     403,
                     array(
                         "access_record" => $access_record->toArray(),
@@ -158,11 +130,11 @@
                         "success" => false,
                         "response_code" => 500,
                         "error" => array(
-                                "error_code" => 0,
-                                "type" => "SUBSCRIPTION",
-                                "message" => $e->getMessage()
-                            )
-                        ), 500, array(
+                            "error_code" => 0,
+                            "type" => "SUBSCRIPTION",
+                            "message" => $e->getMessage()
+                        )
+                    ), 500, array(
                             "access_record" => $access_record->toArray(),
                             "user_subscription" => $UserSubscription->toArray()
                         )
@@ -225,7 +197,7 @@
             }
             else
             {
-               return false;
+                return false;
             }
 
             if(isset($features["MAX_GENERALIZATION_SIZE"]))
@@ -361,4 +333,3 @@
             );
         }
     }
-
