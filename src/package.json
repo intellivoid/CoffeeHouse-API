@@ -51,18 +51,6 @@
         },
         {
             "required": true,
-            "file": "Methods/v1/create_lydia_session.php"
-        },
-        {
-            "required": true,
-            "file": "Methods/v1/get_lydia_session_attributes.php"
-        },
-        {
-            "required": true,
-            "file": "Methods/v1/lydia_think_thought.php"
-        },
-        {
-            "required": true,
             "file": "Methods/v1/sentiment_analysis.php"
         },
         {
@@ -76,10 +64,6 @@
         {
             "required": true,
             "file": "Methods/v1/emotion_analysis.php"
-        },
-        {
-            "required": true,
-            "file": "Methods/v1/get_lydia_session.php"
         },
         {
             "required": true,
