@@ -31,19 +31,59 @@
     "components": [
         {
             "required": true,
-            "file": "Methods/v1/ParameterTestMethod.php"
+            "file": "Methods/Classes/Utilities.php"
         },
         {
             "required": true,
-            "file": "Methods/v1/UserAuthenticationTestMethod.php"
+            "file": "Methods/Classes/SubscriptionValidation.php"
         },
         {
             "required": true,
-            "file": "Methods/v1/PingMethod.php"
+            "file": "Methods/v1/language_detection.php"
         },
         {
             "required": true,
-            "file": "Methods/v1/AuthenticationTestMethod.php"
+            "file": "Methods/v1/sentence_split.php"
+        },
+        {
+            "required": true,
+            "file": "Methods/v1/nsfw_classification.php"
+        },
+        {
+            "required": true,
+            "file": "Methods/v1/create_lydia_session.php"
+        },
+        {
+            "required": true,
+            "file": "Methods/v1/get_lydia_session_attributes.php"
+        },
+        {
+            "required": true,
+            "file": "Methods/v1/lydia_think_thought.php"
+        },
+        {
+            "required": true,
+            "file": "Methods/v1/sentiment_analysis.php"
+        },
+        {
+            "required": true,
+            "file": "Methods/v1/named_entity_recognition.php"
+        },
+        {
+            "required": true,
+            "file": "Methods/v1/pos_tagging.php"
+        },
+        {
+            "required": true,
+            "file": "Methods/v1/emotion_analysis.php"
+        },
+        {
+            "required": true,
+            "file": "Methods/v1/get_lydia_session.php"
+        },
+        {
+            "required": true,
+            "file": "Methods/v1/chatroom_spam_prediction.php"
         }
     ],
     "files": [
