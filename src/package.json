@@ -17,7 +17,25 @@
             {
                 "package": "net.intellivoid.api",
                 "version": "latest",
-                "source": "",
+                "source": "default@github/intellivoid/Intellivoid-API",
+                "required": true
+            },
+            {
+                "package": "net.intellivoid.coffeehouse",
+                "version": "latest",
+                "source": "default@github/intellivoid/CoffeeHouse",
+                "required": true
+            },
+            {
+                "package": "net.intellivoid.subscriptions",
+                "version": "latest",
+                "source": "default@github/intellivoid/Intellivoid-Subscription-Manager",
+                "required": true
+            },
+            {
+                "package": "net.intellivoid.coa_sniffle",
+                "version": "latest",
+                "source": "default@github/intellivoid/COASniffle",
                 "required": true
             }
         ],
