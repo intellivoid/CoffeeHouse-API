@@ -383,6 +383,7 @@
             {
                 $SentencesResults = [];
 
+                /** @noinspection PhpUndefinedVariableInspection */
                 foreach($LanguageSentencesResults->LanguagePredictionSentences as $languagePredictionSentence)
                 {
                     $predictions = [];
@@ -409,35 +410,24 @@
                 $predictions = [];
                 $combined_results = $LanguageSentencesResults->LanguagePrediction->combineResults();
 
-                foreach($combined_results as $datum)
-                {
-                    $datum->updateProbability();
-                    try
-                    {
-                        $predictions[Utilities::convertToISO6391($datum->Language)] = $datum->Probability * 100;
-                    }
-                    catch (InvalidLanguageException $e)
-                    {
-                        unset($e);
-                    }
-                }
             }
             else
             {
                 $predictions = [];
                 $combined_results = $LanguageResults->combineResults();
 
-                foreach($combined_results as $datum)
+            }
+
+            foreach($combined_results as $datum)
+            {
+                $datum->updateProbability();
+                try
                 {
-                    $datum->updateProbability();
-                    try
-                    {
-                        $predictions[Utilities::convertToISO6391($datum->Language)] = $datum->Probability * 100;
-                    }
-                    catch (InvalidLanguageException $e)
-                    {
-                        unset($e);
-                    }
+                    $predictions[Utilities::convertToISO6391($datum->Language)] = $datum->Probability * 100;
+                }
+                catch (InvalidLanguageException $e)
+                {
+                    unset($e);
                 }
             }
 
