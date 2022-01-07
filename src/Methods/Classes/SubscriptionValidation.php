@@ -1,7 +1,34 @@
 <?php
 
+    /** @noinspection PhpMissingFieldTypeInspection */
 
     namespace Methods\Classes;
+
+    use COASniffle\COASniffle;
+    use COASniffle\Exceptions\CoaAuthenticationException;
+    use COASniffle\Handlers\COA;
+    use CoffeeHouse\Abstracts\UserSubscriptionSearchMethod;
+    use CoffeeHouse\CoffeeHouse;
+    use CoffeeHouse\Exceptions\UserSubscriptionNotFoundException;
+    use CoffeeHouse\Objects\UserSubscription;
+    use Exception;
+    use IntellivoidAPI\Exceptions\AccessRecordNotFoundException;
+    use IntellivoidAPI\Exceptions\DatabaseException;
+    use IntellivoidAPI\Exceptions\InvalidRateLimitConfiguration;
+    use IntellivoidAPI\Exceptions\InvalidSearchMethodException;
+    use IntellivoidAPI\IntellivoidAPI;
+    use IntellivoidAPI\Objects\AccessRecord;
+    use IntellivoidSubscriptionManager\Abstracts\SearchMethods\SubscriptionSearchMethod;
+    use IntellivoidSubscriptionManager\Exceptions\SubscriptionNotFoundException;
+    use IntellivoidSubscriptionManager\IntellivoidSubscriptionManager;
+    use IntellivoidSubscriptionManager\Objects\Subscription;
+    use IntellivoidSubscriptionManager\Utilities\Converter;
+    use KimchiAPI\Abstracts\ResponseStandard;
+    use KimchiAPI\Exceptions\ApiException;
+    use KimchiAPI\Exceptions\UnsupportedResponseStandardException;
+    use KimchiAPI\Exceptions\UnsupportedResponseTypeExceptions;
+    use KimchiAPI\KimchiAPI;
+    use KimchiAPI\Objects\Response;
 
     class SubscriptionValidation
     {
@@ -24,14 +51,17 @@
          * Processes the access key and determines if it used against a valid subscription.
          *
          * @param CoffeeHouse $coffeeHouse
+         * @param IntellivoidAPI $intellivoidAPI
          * @param AccessRecord $access_record
-         * @return null|array
+         * @throws ApiException
+         * @throws UnsupportedResponseStandardException
+         * @throws UnsupportedResponseTypeExceptions
          * @throws AccessRecordNotFoundException
-         * @throws InvalidRateLimitConfiguration
          * @throws DatabaseException
+         * @throws InvalidRateLimitConfiguration
          * @throws InvalidSearchMethodException
          */
-        public function validateUserSubscription(CoffeeHouse $coffeeHouse, AccessRecord $access_record): ?array
+        public function validateUserSubscription(CoffeeHouse $coffeeHouse, IntellivoidAPI $intellivoidAPI, AccessRecord &$access_record)
         {
             try
             {
@@ -41,26 +71,19 @@
             }
             catch (UserSubscriptionNotFoundException $e)
             {
-                return $this::buildResponse(array(
-                    "success" => false,
-                    "response_code" => 500,
-                    "error" => array(
-                        "error_code" => 0,
-                        "type" => "SUBSCRIPTION",
-                        "message" => "There was an error while trying to verify your subscription, the system couldn't find your subscription."
-                    )
-                ),
-                    500,
-                    array(
-                        "access_record" => $access_record->toArray()
-                    )
-                );
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 500;
+                $Response->ErrorMessage = 'There was an error while trying to verify your subscription, the system couldn\'t find your subscription.';
+                $Response->ErrorCode = 0;
+                $Response->Exception = $e;
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
+                KimchiAPI::handleResponse($Response);
             }
             catch(Exception $e)
             {
-                InternalServerError::executeResponse($e);
-                exit();
+                KimchiAPI::handleException($e, ResponseStandard::IntellivoidAPI);
             }
 
             $IntellivoidSubscriptionManager = new IntellivoidSubscriptionManager();
@@ -68,57 +91,48 @@
 
             try
             {
+                /** @noinspection PhpUndefinedVariableInspection */
                 $Subscription = $IntellivoidSubscriptionManager->getSubscriptionManager()->getSubscription(
                     SubscriptionSearchMethod::byId, $UserSubscription->SubscriptionID
                 );
             }
             catch (SubscriptionNotFoundException $e)
             {
-                return $this::buildResponse(array(
-                    "success" => false,
-                    "response_code" => 403,
-                    "error" => array(
-                        "error_code" => 0,
-                        "type" => "SUBSCRIPTION",
-                        "message" => "You do not have an active subscription with this service"
-                    )
-                ),
-                    403,
-                    array(
-                        "access_record" => $access_record->toArray(),
-                        "user_subscription" => $UserSubscription->toArray()
-                    )
-                );
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 403;
+                $Response->ErrorMessage = 'You do not have an active subscription with this service';
+                $Response->ErrorCode = 0;
+                $Response->Exception = $e;
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+
+                KimchiAPI::handleResponse($Response);
             }
             catch(Exception $e)
             {
-                InternalServerError::executeResponse($e);
-                exit();
+                KimchiAPI::handleException($e, ResponseStandard::IntellivoidAPI);
             }
 
             // PATCH: Sometimes if a user wants to upgrade their subscription, the features are not yet applied.
+            /** @noinspection PhpUndefinedVariableInspection */
             $Features = Converter::featuresToSA($Subscription->Properties->Features, true);
 
             if(self::updateSubscriptionFeatures($Features, $access_record) == false)
             {
-                return $this::buildResponse(array(
-                    "success" => false,
-                    "response_code" => 403,
-                    "error" => array(
-                        "error_code" => 0,
-                        "type" => "SUBSCRIPTION",
-                        "message" => "There are new updates to your subscription, login to the dashboard to update your subscription."
-                    )
-                ), 403, array(
-                        "access_record" => $access_record->toArray(),
-                        "user_subscription" => $UserSubscription->toArray()
-                    )
-                );
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 403;
+                $Response->ErrorMessage = 'There are new updates to your subscription, login to the dashboard to update your subscription';
+                $Response->ErrorCode = 0;
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+
+                KimchiAPI::handleResponse($Response);
             }
 
+            /** @noinspection PhpCastIsUnnecessaryInspection */
             if((int)time() > $Subscription->NextBillingCycle)
             {
-                new COASniffle\COASniffle();
+                new COASniffle();
 
                 try
                 {
@@ -126,26 +140,22 @@
                 }
                 catch (CoaAuthenticationException $e)
                 {
-                    return $this::buildResponse(array(
-                        "success" => false,
-                        "response_code" => 500,
-                        "error" => array(
-                            "error_code" => 0,
-                            "type" => "SUBSCRIPTION",
-                            "message" => $e->getMessage()
-                        )
-                    ), 500, array(
-                            "access_record" => $access_record->toArray(),
-                            "user_subscription" => $UserSubscription->toArray()
-                        )
-                    );
+                    $Response = new Response();
+                    $Response->Success = false;
+                    $Response->ResponseCode = 500;
+                    $Response->ErrorMessage = $e->getMessage();
+                    $Response->ErrorCode = 0;
+                    $Response->Exception = $e;
+                    $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+
+                    KimchiAPI::handleResponse($Response);
                 }
                 catch(Exception $e)
                 {
-                    InternalServerError::executeResponse($e);
-                    exit();
+                    KimchiAPI::handleException($e, ResponseStandard::IntellivoidAPI);
                 }
 
+                /** @noinspection PhpUndefinedVariableInspection */
                 if($BillingProcessed)
                 {
                     // Reset all counters
@@ -161,21 +171,19 @@
                 }
             }
 
-            $IntellivoidAPI = Handler::getIntellivoidAPI();
-            $IntellivoidAPI->getAccessKeyManager()->updateAccessRecord($access_record);
+            $intellivoidAPI->getAccessKeyManager()->updateAccessRecord($access_record);
 
             $this->subscription = $Subscription;
             $this->user_subscription = $UserSubscription;
-
-            return null;
         }
 
         /**
-         * Updates all the API Variables from the subscription to make sure it's up to date.
+         * Updates all the API Variables from the subscription to make sure it's up-to-date.
          *
          * @param array $features
          * @param AccessRecord $access_record
          * @return bool
+         * @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection
          */
         private static function updateSubscriptionFeatures(array $features, AccessRecord &$access_record): bool
         {
@@ -313,23 +321,5 @@
             }
 
             return true;
-        }
-
-        /**
-         * Builds a standard response which is understood by modules
-         *
-         * @param array $response_content
-         * @param int $response_code
-         * @param array $debugging_info
-         * @return array
-         * @noinspection PhpArrayShapeAttributeCanBeAddedInspection
-         */
-        private static function buildResponse(array $response_content, int $response_code, array $debugging_info): array
-        {
-            return array(
-                "response" => $response_content,
-                "response_code" => (int)$response_code,
-                "debug" => $debugging_info
-            );
         }
     }
