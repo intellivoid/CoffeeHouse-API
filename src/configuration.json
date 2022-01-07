@@ -15,7 +15,15 @@
       "version": "v1",
       "enabled": true,
       "methods": [
-        {"methods": ["GET", "POST"], "path": "nlp/spam_prediction/chatroom", "class": "\\Methods\\v1\\ChatroomSpamPredictionMethod"}
+        {"methods": ["GET", "POST"], "path": "nlp/pos_tagging", "class": "\\Methods\\v1\\PosTaggingMethod"},
+        {"methods": ["GET", "POST"], "path": "nlp/sentiment_analysis", "class": "\\Methods\\v1\\SentimentAnalysis"},
+        {"methods": ["GET", "POST"], "path": "nlp/emotion_analysis", "class": "\\Methods\\v1\\EmotionAnalysisMethod"},
+        {"methods": ["GET", "POST"], "path": "nlp/language_detection", "class": "\\Methods\\v1\\LanguageDetectionMethod"},
+        {"methods": ["GET", "POST"], "path": "nlp/language_detection", "class": "\\Methods\\v1\\LanguageDetectionMethod"},
+        {"methods": ["GET", "POST"], "path": "nlp/named_entity_recognition", "class": "\\Methods\\v1\\ChatroomSpamPredictionMethod"},
+        {"methods": ["GET", "POST"], "path": "nlp/sentence_split", "class": "\\Methods\\v1\\SentenceSplitMethod"},
+        {"methods": ["GET", "POST"], "path": "nlp/spam_prediction/chatroom", "class": "\\Methods\\v1\\ChatroomSpamPredictionMethod"},
+        {"methods": ["GET", "POST"], "path": "image/nsfw_classification", "class": "\\Methods\\v1\\NsfwClassificationMethod"}
       ]
     }
   ]
