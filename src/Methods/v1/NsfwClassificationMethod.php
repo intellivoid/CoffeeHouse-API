@@ -328,7 +328,7 @@
             }
             catch(Exception $e)
             {
-                throw new RuntimeException('Invalid base64 data', 53);
+                throw new RuntimeException('Invalid base64 data', 53, $e);
             }
 
             if(strlen($content) > 8388608)
