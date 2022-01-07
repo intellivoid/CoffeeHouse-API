@@ -25,111 +25,103 @@
     use CoffeeHouse\Exceptions\NoResultsFoundException;
     use CoffeeHouse\Objects\LargeGeneralization;
     use Exception;
+    use IntellivoidAPI\Exceptions\AccessRecordNotFoundException;
+    use IntellivoidAPI\Exceptions\InvalidRateLimitConfiguration;
+    use IntellivoidAPI\IntellivoidAPI;
+    use IntellivoidAPI\Objects\AccessRecord;
     use KimchiAPI\Abstracts\Method;
+    use KimchiAPI\Abstracts\ResponseStandard;
+    use KimchiAPI\Classes\Request;
+    use KimchiAPI\Exceptions\AccessKeyNotProvidedException;
+    use KimchiAPI\Exceptions\ApiException;
+    use KimchiAPI\Exceptions\UnsupportedResponseStandardException;
+    use KimchiAPI\Exceptions\UnsupportedResponseTypeExceptions;
+    use KimchiAPI\KimchiAPI;
     use KimchiAPI\Objects\Response;
-    use SubscriptionValidation;
+    use Methods\Classes\SubscriptionValidation;
 
     class LanguageDetectionMethod extends Method
     {
         /**
+         * @var AccessRecord
+         */
+        private $AccessRecord;
+
+        /**
          * Process the quota for the subscription, returns false if the quota limit has been reached.
          *
-         * @return bool
+         * @return Response|null
          */
-        private function processQuota(): bool
+        private function processQuota(): ?Response
         {
             // Set the current quota if it doesn't SENTIMENT_CHECKS
-            if(isset($this->access_record->Variables["LANGUAGE_CHECKS"]) == false)
+            if(isset($this->AccessRecord->Variables['LANGUAGE_CHECKS']) == false)
             {
-                $this->access_record->setVariable("LANGUAGE_CHECKS", 0);
+                $this->AccessRecord->setVariable('LANGUAGE_CHECKS', 0);
             }
 
             // If the user has unlimited, ignore the check.
-            if((int)$this->access_record->Variables["MAX_LANGUAGE_CHECKS"] > 0)
+            if((int)$this->AccessRecord->Variables['MAX_LANGUAGE_CHECKS'] > 0)
             {
                 // If the current sessions are equal or greater
-                if($this->access_record->Variables["LANGUAGE_CHECKS"] >= $this->access_record->Variables["MAX_LANGUAGE_CHECKS"])
+                if($this->AccessRecord->Variables['LANGUAGE_CHECKS'] >= $this->AccessRecord->Variables['MAX_LANGUAGE_CHECKS'])
                 {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 429,
-                        "error" => array(
-                            "error_code" => 6,
-                            "type" => "CLIENT",
-                            "message" => "You have reached the max quota for this method"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    return False;
+                    $Response = new Response();
+                    $Response->Success = false;
+                    $Response->ResponseCode = 429;
+                    $Response->ErrorCode = 6;
+                    $Response->ErrorMessage = 'You have reached the max quota for this method';
+                    $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                    return $Response;
                 }
             }
 
-            return True;
+            return null;
         }
 
         /**
          * Validates if the input is applicable to the NLP method
          *
          * @param string $input
-         * @return bool
+         * @return Response|null
          * @noinspection DuplicatedCode
          */
-        private function validateNlpInput(string $input): bool
+        private function validateNlpInput(string $input): ?Response
         {
-            if(isset($this->access_record->Variables["MAX_NLP_CHARACTERS"]) == false)
+            if(isset($this->AccessRecord->Variables["MAX_NLP_CHARACTERS"]) == false)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 500,
-                    "error" => array(
-                        "error_code" => -1,
-                        "type" => "SERVER",
-                        "message" => "The server cannot verify the value 'MAX_NLP_CHARACTERS'"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                return False;
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 500;
+                $Response->ErrorCode = -1;
+                $Response->ErrorMessage = "The server cannot verify the value 'MAX_NLP_CHARACTERS'";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                return $Response;
             }
 
-            if(strlen($input) > (int)$this->access_record->Variables["MAX_NLP_CHARACTERS"])
+            if(strlen($input) > (int)$this->AccessRecord->Variables["MAX_NLP_CHARACTERS"])
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 21,
-                        "type" => "CLIENT",
-                        "message" => "The given input exceeds the limit of '" . $this->access_record->Variables["MAX_NLP_CHARACTERS"] . "' characters. (Subscription restriction)"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                return False;
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 21;
+                $Response->ErrorMessage = "The given input exceeds the limit of '" . $this->AccessRecord->Variables["MAX_NLP_CHARACTERS"] . "' characters. (Subscription restriction)";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                return $Response;
             }
 
             if(strlen($input) == 0)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 22,
-                        "type" => "CLIENT",
-                        "message" => "The given input cannot be empty"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                return False;
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 22;
+                $Response->ErrorMessage = 'The given input cannot be empty';
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                return $Response;
             }
 
-            return True;
+            return null;
         }
 
         /**
@@ -143,7 +135,7 @@
          */
         public function processGeneralization(CoffeeHouse $coffeeHouse): ?LargeGeneralization
         {
-            $Parameters = Handler::getParameters(true, true);
+            $Parameters = Request::getParameters();
 
             // Check if the client is requesting for generalization
             if(isset($Parameters["generalize"]))
@@ -166,35 +158,27 @@
                 }
                 catch (NoResultsFoundException $e)
                 {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 404,
-                        "error" => array(
-                            "error_code" => 18,
-                            "type" => "CLIENT",
-                            "message" => "The requested generalization data was not found"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
+                    $Response = new Response();
+                    $Response->Success = false;
+                    $Response->ResponseCode = 404;
+                    $Response->ErrorCode = 18;
+                    $Response->ErrorMessage = 'The requested generalization data was not found';
+                    $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                    $Response->Exception = $e;
 
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                    KimchiAPI::handleResponse($Response);
                 }
                 catch(Exception $e)
                 {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 500,
-                        "error" => array(
-                            "error_code" => -1,
-                            "type" => "SERVER",
-                            "message" => "There was an unexpected error while trying to retrieve the generalization data from the server"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
+                    $Response = new Response();
+                    $Response->Success = false;
+                    $Response->ResponseCode = 500;
+                    $Response->ErrorCode = -1;
+                    $Response->ErrorMessage = 'There was an unexpected error while trying to retrieve the generalization data from the server';
+                    $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                    $Response->Exception = $e;
 
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                    KimchiAPI::handleResponse($Response);
                 }
 
                 // Verify if this generalization is applicable to this method
@@ -214,6 +198,7 @@
                 $missing_items = 0;
 
                 /** @noinspection DuplicatedCode */
+                /** @noinspection PhpUndefinedVariableInspection */
                 foreach($large_generalization->Probabilities as $probability)
                 {
                     if(in_array($probability->Label, $labels) == false)
@@ -231,19 +216,14 @@
                 // If there's more than or equal to 5 missing items then this generalization may be invalid.
                 if($missing_items >= 10)
                 {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 400,
-                        "error" => array(
-                            "error_code" => 19,
-                            "type" => "CLIENT",
-                            "message" => "This generalization set does not apply to this method"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
+                    $Response = new Response();
+                    $Response->Success = false;
+                    $Response->ResponseCode = 400;
+                    $Response->ErrorCode = 19;
+                    $Response->ErrorMessage = 'This generalization set does not apply to this method';
+                    $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                    KimchiAPI::handleResponse($Response);
                 }
 
                 return $large_generalization;
@@ -251,144 +231,111 @@
 
             if(isset($Parameters["generalization_size"]) == false)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 17,
-                        "type" => "SERVER",
-                        "message" => "Missing parameter 'generalization_size'"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 17;
+                $Response->ErrorMessage = "Missing parameter 'generalization_size'";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                KimchiAPI::handleResponse($Response);
             }
-            else
+
+            $GeneralizationSize = (int)$Parameters["generalization_size"];
+
+            if($GeneralizationSize <= 0)
             {
-                $GeneralizationSize = (int)$Parameters["generalization_size"];
-
-                if($GeneralizationSize <= 0)
-                {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 400,
-                        "error" => array(
-                            "error_code" => 15,
-                            "type" => "CLIENT",
-                            "message" => "The 'generalization_size' parameter cannot contain a value of 0 or negative"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                }
-
-                // Set the current quota if it doesn't exist
-                if(isset($this->access_record->Variables["MAX_GENERALIZATION_SIZE"]) == false)
-                {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 500,
-                        "error" => array(
-                            "error_code" => -1,
-                            "type" => "SERVER",
-                            "message" => "The server cannot process the variable 'MAX_GENERALIZATION_SIZE'"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                }
-
-                if($GeneralizationSize > (int)$this->access_record->Variables["MAX_GENERALIZATION_SIZE"])
-                {
-
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 400,
-                        "error" => [
-                            "error_code" => 16,
-                            "type" => "CLIENT",
-                            "message" => "You cannot exceed a generalization size of '" . $this->access_record->Variables["MAX_GENERALIZATION_SIZE"] . "' (Subscription restriction)"
-                        ]
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                }
-
-                $large_generalization = $coffeeHouse->getLargeGeneralizedClassificationManager()->create($GeneralizationSize);
-                return $large_generalization;
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 15;
+                $Response->ErrorMessage = "The 'generalization_size' parameter cannot contain a value of 0 or negative";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                KimchiAPI::handleResponse($Response);
             }
+
+            // Set the current quota if it doesn't exist
+            if(isset($this->AccessRecord->Variables["MAX_GENERALIZATION_SIZE"]) == false)
+            {
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 500;
+                $Response->ErrorCode = -1;
+                $Response->ErrorMessage = "The server cannot process the variable 'MAX_GENERALIZATION_SIZE'";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                KimchiAPI::handleResponse($Response);
+            }
+
+            if($GeneralizationSize > (int)$this->AccessRecord->Variables["MAX_GENERALIZATION_SIZE"])
+            {
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 500;
+                $Response->ErrorCode = -1;
+                $Response->ErrorMessage = "You cannot exceed a generalization size of '" . $this->AccessRecord->Variables["MAX_GENERALIZATION_SIZE"] . "' (Subscription restriction)";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                KimchiAPI::handleResponse($Response);
+            }
+
+            return $coffeeHouse->getLargeGeneralizedClassificationManager()->create($GeneralizationSize);
+
         }
 
         /**
          * @return Response
          * @throws InvalidLanguageException
+         * @throws AccessRecordNotFoundException
+         * @throws \IntellivoidAPI\Exceptions\DatabaseException
+         * @throws InvalidRateLimitConfiguration
+         * @throws \IntellivoidAPI\Exceptions\InvalidSearchMethodException
+         * @throws AccessKeyNotProvidedException
+         * @throws ApiException
+         * @throws UnsupportedResponseStandardException
+         * @throws UnsupportedResponseTypeExceptions
          */
         public function execute(): Response
         {
+            /** @noinspection DuplicatedCode */
             $CoffeeHouse = new CoffeeHouse();
-
-            // Import the check subscription script and execute it
+            $IntellivoidAPI = new IntellivoidAPI();
+            $this->AccessRecord = \Methods\Classes\Utilities::authenticateUser($IntellivoidAPI, ResponseStandard::IntellivoidAPI);
             $SubscriptionValidation = new SubscriptionValidation();
 
             try
             {
-                $ValidationResponse = $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $this->access_record);
+                $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $IntellivoidAPI, $this->AccessRecord);
             }
             catch (Exception $e)
             {
-                InternalServerError::executeResponse($e);
-                exit();
+                KimchiAPI::handleException($e);
             }
 
-            if(is_null($ValidationResponse) == false)
+            $process_quota_results = $this->processQuota();
+            if($process_quota_results !== null)
+                return $process_quota_results;
+
+            $Parameters = Request::getParameters();
+
+            if(isset($Parameters['input']) == false)
             {
-                $this->response_content = json_encode($ValidationResponse["response"]);
-                $this->response_code = $ValidationResponse["response_code"];
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 20;
+                $Response->ErrorMessage = "Missing parameter 'input'";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                return null;
+                return $Response;
             }
 
-            if($this->processQuota() == false)
-            {
-                return null;
-            }
-
-            $Parameters = Handler::getParameters(true, true);
-
-            if(isset($Parameters["input"]) == false)
-            {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 20,
-                        "type" => "CLIENT",
-                        "message" => "Missing parameter 'input'"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                return false;
-            }
-
-            if($this->validateNlpInput($Parameters["input"]) == false)
-                return false;
-
+            $validateInputResults = $this->validateNlpInput($Parameters['input']);
+            if($validateInputResults !== null)
+                return $validateInputResults;
 
             $SentenceSplit = false;
 
-            if(isset($Parameters["sentence_split"]))
+            if(isset($Parameters['sentence_split']))
             {
-                if((bool)strtolower($Parameters["sentence_split"]) == true)
+                if((bool)strtolower($Parameters['sentence_split']) == true)
                 {
                     $SentenceSplit = true;
                 }
@@ -398,60 +345,38 @@
             {
                 if($SentenceSplit)
                 {
-                    $LanguageSentencesResults = $CoffeeHouse->getLanguagePrediction()->predictSentences($Parameters["input"], true);
+                    $LanguageSentencesResults = $CoffeeHouse->getLanguagePrediction()->predictSentences($Parameters['input'], true);
                 }
                 else
                 {
-                    $LanguageResults = $CoffeeHouse->getLanguagePrediction()->predict($Parameters["input"]);
+                    $LanguageResults = $CoffeeHouse->getLanguagePrediction()->predict($Parameters['input']);
                 }
             }
             catch (CoffeeHouseUtilsNotReadyException $e)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 503,
-                    "error" => array(
-                        "error_code" => 13,
-                        "type" => "SERVER",
-                        "message" => "CoffeeHouse-Utils is temporarily unavailable"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                return false;
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 503;
+                $Response->ErrorCode = 13;
+                $Response->ErrorMessage = 'CoffeeHouse is temporarily unavailable';
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                $Response->Exception = $e;
+                return $Response;
             }
             catch (InvalidInputException | InvalidTextInputException | InvalidLanguageException $e)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 24,
-                        "type" => "CLIENT",
-                        "message" => "The given input cannot be processed"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                return false;
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 500;
+                $Response->ErrorCode = 13;
+                $Response->ErrorMessage = 'There was an error while trying to auto-detect the language';
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                $Response->Exception = $e;
+                return $Response;
             }
             catch(Exception $e)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 500,
-                    "error" => array(
-                        "error_code" => -1,
-                        "type" => "SERVER",
-                        "message" => "There was an unexpected error while trying to process your input"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                return false;
+                KimchiAPI::handleException($e);
             }
 
             if($SentenceSplit)
@@ -470,13 +395,13 @@
                     }
 
                     $SentencesResults[] = [
-                        "text" => $languagePredictionSentence->Text,
-                        "offset_begin" => $languagePredictionSentence->OffsetBegin,
-                        "offset_end" => $languagePredictionSentence->OffsetEnd,
-                        "language_detection" => [
-                            "language" => $combined_results[0]->Language,
-                            "prediction" => $combined_results[0]->Probability * 100,
-                            "predictions" => $predictions
+                        'text' => $languagePredictionSentence->Text,
+                        'offset_begin' => $languagePredictionSentence->OffsetBegin,
+                        'offset_end' => $languagePredictionSentence->OffsetEnd,
+                        'language_detection' => [
+                            'language' => $combined_results[0]->Language,
+                            'prediction' => $combined_results[0]->Probability * 100,
+                            'predictions' => $predictions
                         ]
                     ];
                 }
@@ -516,40 +441,34 @@
                 }
             }
 
+            $Response = new Response();
+            $Response->Success = true;
+            $Response->ResponseCode = 200;
+
             if($SentenceSplit)
             {
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $ResponsePayload = array(
-                    "success" => true,
-                    "response_code" => 200,
-                    "results" => [
-                        "text" => $LanguageSentencesResults->Text,
-                        "language_detection" => [
-                            "language" => Utilities::convertToISO6391($combined_results[0]->Language),
-                            "prediction" => $combined_results[0]->Probability * 100,
-                            "predictions" => $predictions
-                        ],
-                        "sentences" => $SentencesResults,
-                        "generalization" => null
-                    ]
-                );
+                $Response->ResultData = [
+                    'text' => $LanguageSentencesResults->Text,
+                    'language_detection' => [
+                        'language' => Utilities::convertToISO6391($combined_results[0]->Language),
+                        'prediction' => $combined_results[0]->Probability * 100,
+                        'predictions' => $predictions
+                    ],
+                    'sentences' => $SentencesResults,
+                    'generalization' => null
+                ];
             }
             else
             {
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $ResponsePayload = array(
-                    "success" => true,
-                    "response_code" => 200,
-                    "results" => [
-                        "text" => $Parameters["input"],
-                        "language_detection" => [
-                            "language" => Utilities::convertToISO6391($combined_results[0]->Language),
-                            "prediction" => $combined_results[0]->Probability * 100,
-                            "predictions" => $predictions
-                        ],
-                        "generalization" => null
-                    ]
-                );
+                $Response->ResultData = [
+                    'text' => $Parameters['input'],
+                    'language_detection' => [
+                        'language' => Utilities::convertToISO6391($combined_results[0]->Language),
+                        'prediction' => $combined_results[0]->Probability * 100,
+                        'predictions' => $predictions
+                    ],
+                    'generalization' => null
+                ];
             }
 
             try
@@ -558,8 +477,6 @@
 
                 if($generalization !== null)
                 {
-                    $generalizationTarget = null;
-
                     if($SentenceSplit)
                     {
                         $generalizationTarget = $LanguageSentencesResults->LanguagePrediction;
@@ -572,8 +489,8 @@
                     $generalization = $CoffeeHouse->getLanguagePrediction()->generalize($generalization, $generalizationTarget);
 
                     // Pre-calculate the probabilities
+                    /** @noinspection DuplicatedCode */
                     $generalization->TopProbability = $generalization->TopProbability * 100;
-
                     $probabilities_data = array();
 
                     foreach ($generalization->Probabilities as $probability)
@@ -582,38 +499,33 @@
                         foreach($probability->Probabilities as $f) $probabilities_set[] = $f * 100;
 
                         $probabilities_data[] = [
-                            "label" => $probability->Label,
-                            "calculated_probability" => $probability->CalculatedProbability * 100,
-                            "current_pointer" => $probability->CurrentPointer - 1,
-                            "probabilities" => $probabilities_set
+                            'label' => $probability->Label,
+                            'calculated_probability' => $probability->CalculatedProbability * 100,
+                            'current_pointer' => $probability->CurrentPointer - 1,
+                            'probabilities' => $probabilities_set
                         ];
                     }
 
-                    $ResponsePayload["results"]["generalization"] = [
-                        "id" => $generalization->PublicID,
-                        "size" => $generalization->MaxProbabilitiesSize,
-                        "top_label" => $generalization->TopLabel,
-                        "top_probability" => $generalization->TopProbability,
-                        "probabilities" => $probabilities_data
+                    $Response->ResultData['generalization'] = [
+                        'id' => $generalization->PublicID,
+                        'size' => $generalization->MaxProbabilitiesSize,
+                        'top_label' => $generalization->TopLabel,
+                        'top_probability' => $generalization->TopProbability,
+                        'probabilities' => $probabilities_data
                     ];
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
                 }
             }
             catch(Exception $e)
             {
-                // The request failed, already responded.
-                return false;
+                KimchiAPI::handleException($e);
             }
 
-            $this->response_content = json_encode($ResponsePayload);
-            $this->response_code = (int)$ResponsePayload["response_code"];
+            $this->AccessRecord->Variables['LANGUAGE_CHECKS'] += 1;
+            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'language_checks', 0);
+            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'language_checks', $this->AccessRecord->ID);
+            $IntellivoidAPI->getAccessKeyManager()->updateAccessRecord($this->AccessRecord);
 
-            $this->access_record->Variables["LANGUAGE_CHECKS"] += 1;
-            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "language_checks", 0);
-            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "language_checks", $this->access_record->ID);
-
-            return true;
+            return $Response;
         }
 
     }
