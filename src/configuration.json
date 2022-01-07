@@ -14,7 +14,9 @@
     {
       "version": "v1",
       "enabled": true,
-      "methods": []
+      "methods": [
+        {"methods": ["GET", "POST"], "path": "nlp/spam_prediction/chatroom", "class": "\\Methods\\v1\\ChatroomSpamPredictionMethod"}
+      ]
     }
   ]
 }
