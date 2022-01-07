@@ -260,7 +260,6 @@
 
             if($GeneralizationSize > (int)$this->AccessRecord->Variables["MAX_GENERALIZATION_SIZE"])
             {
-
                 $Response = new Response();
                 $Response->Success = false;
                 $Response->ResponseCode = 500;
@@ -284,14 +283,13 @@
          * @throws \IntellivoidAPI\Exceptions\DatabaseException
          * @throws InvalidRateLimitConfiguration
          * @throws \IntellivoidAPI\Exceptions\InvalidSearchMethodException
+         * @noinspection DuplicatedCode
          */
         public function execute(): Response
         {
             $IntellivoidAPI = new IntellivoidAPI();
             $CoffeeHouse = new CoffeeHouse();
             $this->AccessRecord = \Methods\Classes\Utilities::authenticateUser($IntellivoidAPI, ResponseStandard::IntellivoidAPI);
-
-            // Import the check subscription script and execute it
             $SubscriptionValidation = new SubscriptionValidation();
 
             try

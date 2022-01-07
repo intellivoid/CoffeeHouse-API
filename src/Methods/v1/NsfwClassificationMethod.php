@@ -23,49 +23,60 @@
     use CoffeeHouse\Objects\LargeGeneralization;
     use CoffeeHouse\Objects\Results\NsfwClassificationResults;
     use Exception;
+    use IntellivoidAPI\Exceptions\AccessRecordNotFoundException;
+    use IntellivoidAPI\Exceptions\InvalidRateLimitConfiguration;
+    use IntellivoidAPI\IntellivoidAPI;
+    use IntellivoidAPI\Objects\AccessRecord;
     use KimchiAPI\Abstracts\Method;
+    use KimchiAPI\Abstracts\ResponseStandard;
+    use KimchiAPI\Classes\Request;
+    use KimchiAPI\Exceptions\AccessKeyNotProvidedException;
+    use KimchiAPI\Exceptions\ApiException;
+    use KimchiAPI\Exceptions\UnsupportedResponseStandardException;
+    use KimchiAPI\Exceptions\UnsupportedResponseTypeExceptions;
+    use KimchiAPI\KimchiAPI;
     use KimchiAPI\Objects\Response;
+    use Methods\Classes\SubscriptionValidation;
+    use Methods\Classes\Utilities;
     use RuntimeException;
-    use SubscriptionValidation;
 
     class NsfwClassificationMethod extends Method
     {
         /**
+         * @var AccessRecord
+         */
+        private $AccessRecord;
+
+        /**
          * Process the quota for the subscription, returns false if the quota limit has been reached.
          *
-         * @return bool
+         * @return Response|null
          */
-        private function processQuota(): bool
+        private function processQuota(): ?Response
         {
             // Set the current quota if it doesn't exist
-            if(isset($this->access_record->Variables["NFW_CHECKS"]) == false)
+            if(isset($this->AccessRecord->Variables["NFW_CHECKS"]) == false)
             {
-                $this->access_record->setVariable("NFW_CHECKS", 0);
+                $this->AccessRecord->setVariable("NFW_CHECKS", 0);
             }
 
             // If the user has unlimited, ignore the check.
-            if((int)$this->access_record->Variables["MAX_NSFW_CHECKS"] > 0)
+            if((int)$this->AccessRecord->Variables["MAX_NSFW_CHECKS"] > 0)
             {
                 // If the current sessions are equal or greater
-                if($this->access_record->Variables["NFW_CHECKS"] >= $this->access_record->Variables["MAX_NSFW_CHECKS"])
+                if($this->AccessRecord->Variables["NFW_CHECKS"] >= $this->AccessRecord->Variables["MAX_NSFW_CHECKS"])
                 {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 429,
-                        "error" => array(
-                            "error_code" => 6,
-                            "type" => "CLIENT",
-                            "message" => "You have reached the max quota for this method"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    return False;
+                    $Response = new Response();
+                    $Response->Success = false;
+                    $Response->ResponseCode = 429;
+                    $Response->ErrorCode = 6;
+                    $Response->ErrorMessage = 'You have reached the max quota for this method';
+                    $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                    return $Response;
                 }
             }
 
-            return True;
+            return null;
         }
 
         /**
@@ -75,10 +86,12 @@
          * @throws InvalidSearchMethodException
          * @throws NoResultsFoundException
          * @throws Exception
+         * @noinspection DuplicatedCode
+         * @noinspection PhpUndefinedVariableInspection
          */
         public function processGeneralization(CoffeeHouse $coffeeHouse): ?LargeGeneralization
         {
-            $Parameters = Handler::getParameters(true, true);
+            $Parameters = Request::getParameters();
 
             // Check if the client is requesting for generalization
             if(isset($Parameters["generalize"]))
@@ -101,35 +114,27 @@
                 }
                 catch (NoResultsFoundException $e)
                 {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 404,
-                        "error" => array(
-                            "error_code" => 18,
-                            "type" => "CLIENT",
-                            "message" => "The requested generalization data was not found"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
+                    $Response = new Response();
+                    $Response->Success = false;
+                    $Response->ResponseCode = 404;
+                    $Response->ErrorCode = 18;
+                    $Response->ErrorMessage = 'The requested generalization data was not found';
+                    $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                    $Response->Exception = $e;
 
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                    KimchiAPI::handleResponse($Response);
                 }
                 catch(Exception $e)
                 {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 500,
-                        "error" => array(
-                            "error_code" => -1,
-                            "type" => "SERVER",
-                            "message" => "There was an unexpected error while trying to retrieve the generalization data from the server"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
+                    $Response = new Response();
+                    $Response->Success = false;
+                    $Response->ResponseCode = 500;
+                    $Response->ErrorCode = -1;
+                    $Response->ErrorMessage = 'There was an unexpected error while trying to retrieve the generalization data from the server';
+                    $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                    $Response->Exception = $e;
 
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                    KimchiAPI::handleResponse($Response);
                 }
 
                 // Verify if this generalization is applicable to this method
@@ -150,19 +155,14 @@
                 {
                     if(in_array($label, $applicable_labels) == false)
                     {
-                        $ResponsePayload = array(
-                            "success" => false,
-                            "response_code" => 400,
-                            "error" => array(
-                                "error_code" => 19,
-                                "type" => "CLIENT",
-                                "message" => "This generalization set does not apply to this method"
-                            )
-                        );
-                        $this->response_content = json_encode($ResponsePayload);
-                        $this->response_code = (int)$ResponsePayload["response_code"];
+                        $Response = new Response();
+                        $Response->Success = false;
+                        $Response->ResponseCode = 400;
+                        $Response->ErrorCode = 19;
+                        $Response->ErrorMessage = 'This generalization set does not apply to this method';
+                        $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                        throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                        KimchiAPI::handleResponse($Response);
                     }
                 }
 
@@ -171,91 +171,67 @@
 
             if(isset($Parameters["generalization_size"]) == false)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 17,
-                        "type" => "SERVER",
-                        "message" => "Missing parameter 'generalization_size'"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 17;
+                $Response->ErrorMessage = "Missing parameter 'generalization_size'";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                KimchiAPI::handleResponse($Response);
             }
-            else
+
+            $GeneralizationSize = (int)$Parameters["generalization_size"];
+
+            if($GeneralizationSize <= 0)
             {
-                $GeneralizationSize = (int)$Parameters["generalization_size"];
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 15;
+                $Response->ErrorMessage = "The 'generalization_size' parameter cannot contain a value of 0 or negative";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                if($GeneralizationSize <= 0)
-                {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 400,
-                        "error" => array(
-                            "error_code" => 15,
-                            "type" => "CLIENT",
-                            "message" => "The 'generalization_size' parameter cannot contain a value of 0 or negative"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                }
-
-                // Set the current quota if it doesn't exist
-                if(isset($this->access_record->Variables["MAX_GENERALIZATION_SIZE"]) == false)
-                {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 500,
-                        "error" => array(
-                            "error_code" => -1,
-                            "type" => "SERVER",
-                            "message" => "The server cannot process the variable 'MAX_GENERALIZATION_SIZE'"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                }
-
-                if($GeneralizationSize > (int)$this->access_record->Variables["MAX_GENERALIZATION_SIZE"])
-                {
-
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 400,
-                        "error" => [
-                            "error_code" => 16,
-                            "type" => "CLIENT",
-                            "message" => "You cannot exceed a generalization size of '" . $this->access_record->Variables["MAX_GENERALIZATION_SIZE"] . "' (Subscription restriction)"
-                        ]
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
-                }
-
-                $large_generalization = $coffeeHouse->getLargeGeneralizedClassificationManager()->create($GeneralizationSize);
-                return $large_generalization;
+                KimchiAPI::handleResponse($Response);
             }
+
+            // Set the current quota if it doesn't exist
+            if(isset($this->AccessRecord->Variables["MAX_GENERALIZATION_SIZE"]) == false)
+            {
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 500;
+                $Response->ErrorCode = -1;
+                $Response->ErrorMessage = "The server cannot process the variable 'MAX_GENERALIZATION_SIZE'";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+
+                KimchiAPI::handleResponse($Response);
+            }
+
+            if($GeneralizationSize > (int)$this->AccessRecord->Variables["MAX_GENERALIZATION_SIZE"])
+            {
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 500;
+                $Response->ErrorCode = -1;
+                $Response->ErrorMessage = "You cannot exceed a generalization size of '" . $this->AccessRecord->Variables["MAX_GENERALIZATION_SIZE"] . "' (Subscription restriction)";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+
+                KimchiAPI::handleResponse($Response);
+            }
+
+            return $coffeeHouse->getLargeGeneralizedClassificationManager()->create($GeneralizationSize);
         }
 
         /**
          * Processes the image upload
          *
          * @param CoffeeHouse $coffeeHouse
+         * @param Response $Response
          * @param string $input
-         * @return NsfwClassificationResults
-         * @throws Exception
+         * @return NsfwClassificationResults|null
          */
-        public function processClassification(CoffeeHouse $coffeeHouse, string $input): NsfwClassificationResults
+        public function processClassification(CoffeeHouse $coffeeHouse, Response &$Response, string $input): ?NsfwClassificationResults
         {
             try
             {
@@ -270,6 +246,7 @@
                     }
                     catch(Exception $e)
                     {
+                        unset($e);
                         // Do nothing!
                     }
                 }
@@ -278,76 +255,52 @@
                     $results = $coffeeHouse->getNsfwClassification()->classifyImage($input, True);
                 }
 
-                $ResponsePayload = array(
-                    "success" => true,
-                    "response_code" => 200,
-                    "results" => array(
-                        "nsfw_classification" => [
-                            "content_hash" => $results->ContentHash,
-                            "content_type" => $results->ImageType,
-                            "safe_prediction" => $results->SafePrediction * 100,
-                            "unsafe_prediction" => $results->UnsafePrediction * 100,
-                            "is_nsfw" => $results->IsNSFW
-                        ],
-                        "generalization" => null,
-                    )
-                );
+                $Response->ResultData = [
+                    'nsfw_classification' => [
+                        'content_hash' => $results->ContentHash,
+                        'content_type' => $results->ImageType,
+                        'safe_prediction' => $results->SafePrediction * 100,
+                        'unsafe_prediction' => $results->UnsafePrediction * 100,
+                        'is_nsfw' => $results->IsNSFW
+                    ],
+                    'generalization' => null
+                ];
 
-                $coffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "nsfw_classifications", 0);
-                $coffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "nsfw_classifications", $this->access_record->ID);
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $coffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'nsfw_classifications', 0);
+                $coffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'nsfw_classifications', $this->AccessRecord->ID);
 
                 return $results;
             }
             catch (CoffeeHouseUtilsNotReadyException $e)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 503,
-                    "error" => array(
-                        "error_code" => 13,
-                        "type" => "SERVER",
-                        "message" => "CoffeeHouse-Utils is temporarily unavailable"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $Response->Success = false;
+                $Response->ResponseCode = 503;
+                $Response->Exception =  $e;
+                $Response->ErrorMessage = 'CoffeeHouse-Utils is temporarily unavailable';
+                $Response->ErrorCode = 13;
 
-                throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                return null;
 
             }
             catch (UnsupportedImageTypeException $e)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 12,
-                        "type" => "CLIENT",
-                        "message" => "The file type isn't supported for this method"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->Exception =  $e;
+                $Response->ErrorMessage = "The file type isn't supported for this method";
+                $Response->ErrorCode = 12;
 
-                throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                return null;
             }
             catch(Exception $e)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 500,
-                    "error" => array(
-                        "error_code" => -1,
-                        "type" => "SERVER",
-                        "message" => "There was an unexpected error while trying to process your request"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $Response->Success = false;
+                $Response->ResponseCode = 500;
+                $Response->Exception =  $e;
+                $Response->ErrorMessage = 'There was an unexpected error while trying to process your request';
+                $Response->ErrorCode = -1;
 
-                throw new Exception($ResponsePayload["error"]["message"], $ResponsePayload["error"]["error_code"]);
+                return null;
             }
         }
 
@@ -358,28 +311,29 @@
          */
         public function checkBase64Field(): string
         {
-            if(isset(Handler::getParameters(true, true)["image"]) == false)
+            $Parameters = Request::getParameters();
+            if(isset($Parameters['image']) == false)
             {
-                throw new RuntimeException("File not uploaded", 50);
+                throw new RuntimeException('File not uploaded', 50);
             }
 
-            $Data =  Handler::getParameters(true, true)["image"];
+            $Data =  $Parameters['image'];
 
             try
             {
                 $content = base64_decode($Data, true);
 
                 if($content == false)
-                    throw new RuntimeException("Invalid base64 data", 53);
+                    throw new RuntimeException('Invalid base64 data', 53);
             }
             catch(Exception $e)
             {
-                throw new RuntimeException("Invalid base64 data", 53);
+                throw new RuntimeException('Invalid base64 data', 53);
             }
 
             if(strlen($content) > 8388608)
             {
-                throw new RuntimeException("Exceeded filesize limit.", 51);
+                throw new RuntimeException('Exceeded filesize limit.', 51);
             }
 
             return $content;
@@ -392,74 +346,73 @@
          */
         public function checkUpload(): string
         {
-            if(isset($_FILES["image"]) == false)
+            if(isset($_FILES['image']) == false)
             {
-                throw new RuntimeException("File not uploaded", 50);
+                throw new RuntimeException('File not uploaded', 50);
             }
 
             // Undefined | Multiple Files | $_FILES Corruption Attack
             // If this request falls under any of them, treat it invalid.
-            if (!isset($_FILES["image"]["error"]) || is_array($_FILES["image"]["error"]))
+            if (!isset($_FILES['image']['error']) || is_array($_FILES['image']['error']))
             {
-                throw new RuntimeException("File not uploaded", 50);
+                throw new RuntimeException('File not uploaded', 50);
             }
 
             // Check $_FILES['upfile']['error'] value.
-            switch ($_FILES["image"]["error"])
+            switch ($_FILES['image']['error'])
             {
                 case UPLOAD_ERR_OK:
                     break;
 
                 case UPLOAD_ERR_INI_SIZE:
                 case UPLOAD_ERR_FORM_SIZE:
-                    throw new RuntimeException("Exceeded filesize limit.", 51);
+                    throw new RuntimeException('Exceeded filesize limit.', 51);
 
                 default:
-                    throw new RuntimeException("File upload error", 52);
+                    throw new RuntimeException('File upload error', 52);
             }
 
             // You should also check filesize here.
             if ($_FILES['image']['size'] > 8388608)
             {
-                throw new RuntimeException("Exceeded filesize limit.", 51);
+                throw new RuntimeException('Exceeded filesize limit.', 51);
             }
 
-            return $_FILES["image"]["tmp_name"];
+            return $_FILES['image']['tmp_name'];
         }
 
         /**
-         * @inheritDoc
+         * @return Response
+         * @throws AccessRecordNotFoundException
+         * @throws \IntellivoidAPI\Exceptions\DatabaseException
+         * @throws InvalidRateLimitConfiguration
+         * @throws \IntellivoidAPI\Exceptions\InvalidSearchMethodException
+         * @throws AccessKeyNotProvidedException
+         * @throws ApiException
+         * @throws UnsupportedResponseStandardException
+         * @throws UnsupportedResponseTypeExceptions
          * @noinspection DuplicatedCode
          */
         public function execute(): Response
         {
+            $IntellivoidAPI = new IntellivoidAPI();
             $CoffeeHouse = new CoffeeHouse();
-
-            // Import the check subscription script and execute it
+            $this->AccessRecord = Utilities::authenticateUser($IntellivoidAPI, ResponseStandard::IntellivoidAPI);
             $SubscriptionValidation = new SubscriptionValidation();
 
             try
             {
-                $ValidationResponse = $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $this->access_record);
+                $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $IntellivoidAPI, $this->AccessRecord);
             }
             catch (Exception $e)
             {
-                InternalServerError::executeResponse($e);
-                exit();
+                KimchiAPI::handleException($e);
             }
 
-            if(is_null($ValidationResponse) == false)
-            {
-                $this->response_content = json_encode($ValidationResponse["response"]);
-                $this->response_code = $ValidationResponse["response_code"];
+            $process_quota_results = $this->processQuota();
+            if($process_quota_results !== null)
+                return $process_quota_results;
 
-                return null;
-            }
-
-            if($this->processQuota() == false)
-            {
-                return null;
-            }
 
             $image_content = null;
 
@@ -469,37 +422,25 @@
             }
             catch(RuntimeException $e)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => null,
-                    "error" => array(
-                        "error_code" => null,
-                        "type" => "CLIENT",
-                        "message" => null
-                    )
-                );
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->Exception = $e;
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
                 switch($e->getCode())
                 {
                     case 51:
-                        $ResponsePayload["response_code"] = 413;
-                        $ResponsePayload["error"]["error_code"] = 9;
-                        $ResponsePayload["error"]["message"] = "File content too large";
-
-                        $this->response_content = json_encode($ResponsePayload);
-                        $this->response_code = (int)$ResponsePayload["response_code"];
-
-                        return false;
+                        $Response->ResponseCode = 413;
+                        $Response->ErrorCode = 9;
+                        $Response->ErrorMessage = 'File content too large';
+                        return $Response;
 
                     case 52:
-                        $ResponsePayload["response_code"] = 500;
-                        $ResponsePayload["error"]["error_code"] = 10;
-                        $ResponsePayload["error"]["message"] = "File upload error";
-
-                        $this->response_content = json_encode($ResponsePayload);
-                        $this->response_code = (int)$ResponsePayload["response_code"];
-
-                        return false;
+                        $Response->ResponseCode = 500;
+                        $Response->ErrorCode = 10;
+                        $Response->ErrorMessage = 'File upload error';
+                        return $Response;
 
                     default:
                         break;
@@ -514,47 +455,31 @@
                 }
                 catch(RuntimeException $e)
                 {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => null,
-                        "error" => array(
-                            "error_code" => null,
-                            "type" => "CLIENT",
-                            "message" => null
-                        )
-                    );
+                    $Response = new Response();
+                    $Response->Success = false;
+                    $Response->ResponseCode = 400;
+                    $Response->Exception = $e;
+                    $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
                     switch($e->getCode())
                     {
                         case 51:
-                            $ResponsePayload["response_code"] = 413;
-                            $ResponsePayload["error"]["error_code"] = 9;
-                            $ResponsePayload["error"]["message"] = "File content too large";
-
-                            $this->response_content = json_encode($ResponsePayload);
-                            $this->response_code = (int)$ResponsePayload["response_code"];
-
-                            return false;
+                            $Response->ResponseCode = 413;
+                            $Response->ErrorCode = 9;
+                            $Response->ErrorMessage = 'File content too large';
+                            return $Response;
 
                         case 52:
-                            $ResponsePayload["response_code"] = 500;
-                            $ResponsePayload["error"]["error_code"] = 10;
-                            $ResponsePayload["error"]["message"] = "File upload error";
-
-                            $this->response_content = json_encode($ResponsePayload);
-                            $this->response_code = (int)$ResponsePayload["response_code"];
-
-                            return false;
+                            $Response->ResponseCode = 500;
+                            $Response->ErrorCode = 10;
+                            $Response->ErrorMessage = 'File upload error';
+                            return $Response;
 
                         case 53:
-                            $ResponsePayload["response_code"] = 400;
-                            $ResponsePayload["error"]["error_code"] = 11;
-                            $ResponsePayload["error"]["message"] = "Invalid base64 data";
-
-                            $this->response_content = json_encode($ResponsePayload);
-                            $this->response_code = (int)$ResponsePayload["response_code"];
-
-                            return false;
+                            $Response->ResponseCode = 400;
+                            $Response->ErrorCode = 11;
+                            $Response->ErrorMessage = 'Invalid base64 data';
+                            return $Response;
 
                         default:
                             break;
@@ -562,34 +487,33 @@
                 }
             }
 
+            $Response = new Response();
+            $Response->Success = true;
+            $Response->ResponseCode = 200;
+            $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
             if($image_content == null)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 14,
-                        "type" => "CLIENT",
-                        "message" => "Missing file upload or data field 'image'"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 14;
+                $Response->ErrorMessage = "Missing file upload or data field 'image'";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                return false;
+                return $Response;
             }
-
 
             try
             {
-                $classificationResults = $this->processClassification($CoffeeHouse, $image_content);
+                $classificationResults = $this->processClassification($CoffeeHouse, $Response, $image_content);
             }
             catch(Exception $e)
             {
-                // The request failed, already responded.
-                return false;
+                KimchiAPI::handleException($e);
             }
+
+            if($Response->Success == false)
+                return $Response;
 
             try
             {
@@ -598,10 +522,7 @@
                 if($generalization !== null)
                 {
                     $generalization = $CoffeeHouse->getNsfwClassification()->generalize($generalization, $classificationResults);
-
-                    // Pre-calculate the probabilities
                     $generalization->TopProbability = $generalization->TopProbability * 100;
-
                     $probabilities_data = array();
 
                     foreach ($generalization->Probabilities as $probability)
@@ -617,28 +538,25 @@
                         ];
                     }
 
-                    $ResponsePayload = json_decode($this->response_content, true);
-                    $ResponsePayload["results"]["generalization"] = [
+                    $Response->ResultData["generalization"] = [
                         "id" => $generalization->PublicID,
                         "size" => $generalization->MaxProbabilitiesSize,
                         "top_label" => $generalization->TopLabel,
                         "top_probability" => $generalization->TopProbability,
                         "probabilities" => $probabilities_data
                     ];
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
                 }
             }
             catch(Exception $e)
             {
-                // The request failed, already responded.
-                return false;
+                KimchiAPI::handleException($e);
             }
 
-            $this->access_record->Variables["NFW_CHECKS"] += 1;
-            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "nsfw_classifications", 0);
-            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "nsfw_classifications", $this->access_record->ID);
+            $this->AccessRecord->Variables['NFW_CHECKS'] += 1;
+            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'nsfw_classifications', 0);
+            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'nsfw_classifications', $this->AccessRecord->ID);
+            $IntellivoidAPI->getAccessKeyManager()->updateAccessRecord($this->AccessRecord);
 
-            return true;
+            return $Response;
         }
     }
