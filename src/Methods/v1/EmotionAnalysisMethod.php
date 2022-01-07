@@ -141,9 +141,7 @@
         {
             $CoffeeHouse = new CoffeeHouse();
             $IntellivoidAPI = new IntellivoidAPI();
-
             $this->AccessRecord = \Methods\Classes\Utilities::authenticateUser($IntellivoidAPI, ResponseStandard::IntellivoidAPI);
-            // Import the check subscription script and execute it
             $SubscriptionValidation = new SubscriptionValidation();
 
             try
@@ -203,7 +201,7 @@
                     {
                         $Response = new Response();
                         $Response->Success = false;
-                        $Response->ResponseCode = 503;
+                        $Response->ResponseCode = 500;
                         $Response->ErrorCode = 13;
                         $Response->ErrorMessage = 'There was an error while trying to auto-detect the language';
                         $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
