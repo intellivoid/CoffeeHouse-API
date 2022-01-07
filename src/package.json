@@ -57,35 +57,35 @@
         },
         {
             "required": true,
-            "file": "Methods/v1/language_detection.php"
+            "file": "Methods/v1/NsfwClassificationMethod.php"
         },
         {
             "required": true,
-            "file": "Methods/v1/sentence_split.php"
+            "file": "Methods/v1/EmotionAnalysisMethod.php"
         },
         {
             "required": true,
-            "file": "Methods/v1/nsfw_classification.php"
+            "file": "Methods/v1/SentenceSplitMethod.php"
         },
         {
             "required": true,
-            "file": "Methods/v1/sentiment_analysis.php"
+            "file": "Methods/v1/PosTaggingMethod.php"
         },
         {
             "required": true,
-            "file": "Methods/v1/named_entity_recognition.php"
+            "file": "Methods/v1/SentimentAnalysisMethod.php"
         },
         {
             "required": true,
-            "file": "Methods/v1/pos_tagging.php"
+            "file": "Methods/v1/LanguageDetectionMethod.php"
         },
         {
             "required": true,
-            "file": "Methods/v1/emotion_analysis.php"
+            "file": "Methods/v1/ChatroomSpamPredictionMethod.php"
         },
         {
             "required": true,
-            "file": "Methods/v1/chatroom_spam_prediction.php"
+            "file": "Methods/v1/NamedEntityRecognitionMethod.php"
         }
     ],
     "files": [

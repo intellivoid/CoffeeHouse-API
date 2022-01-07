@@ -39,10 +39,6 @@
     use KimchiAPI\Objects\Response;
     use Methods\Classes\SubscriptionValidation;
 
-    /**
-     * Class chatroom_spam_prediction
-     * @package modules\v1
-     */
     class ChatroomSpamPredictionMethod extends Method
     {
         private static $AccessRecord;

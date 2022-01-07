@@ -11,7 +11,7 @@
     /** @noinspection PhpUnused */
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace modules\v1;
+    namespace Methods\v1;
 
     use CoffeeHouse\Classes\Utilities;
     use CoffeeHouse\CoffeeHouse;
@@ -20,113 +20,12 @@
     use CoffeeHouse\Exceptions\InvalidLanguageException;
     use CoffeeHouse\Exceptions\InvalidTextInputException;
     use Exception;
-    use Handler\Abstracts\Module;
-    use Handler\GenericResponses\InternalServerError;
-    use Handler\Handler;
-    use Handler\Interfaces\Response;
-    use IntellivoidAPI\Objects\AccessRecord;
+    use KimchiAPI\Abstracts\Method;
+    use KimchiAPI\Objects\Response;
     use SubscriptionValidation;
 
-    include_once(__DIR__ . DIRECTORY_SEPARATOR . "script.check_subscription.php");
-    include_once(__DIR__ . DIRECTORY_SEPARATOR . "script.supported_languages.php");
-
-    /**
-     * Class pos_tagging
-     * @package modules\v1
-     */
-    class pos_tagging extends Module implements Response
+    class PosTaggingMethod extends Method
     {
-        /**
-         * The name of the module
-         *
-         * @var string
-         */
-        public string $name = "pos_tagging";
-
-        /**
-         * The version of this module
-         *
-         * @var string
-         */
-        public string $version = "1.0.0.0";
-
-        /**
-         * The description of this module
-         *
-         * @var string
-         */
-        public string $description = "Tags Part-Of-Speech entities from a text input";
-
-        /**
-         * Optional access record for this module
-         *
-         * @var AccessRecord
-         */
-        public AccessRecord $access_record;
-
-        /**
-         * The content to give on the response
-         *
-         * @var string
-         */
-        private $response_content;
-
-        /**
-         * The HTTP response code that will be given to the client
-         *
-         * @var int
-         */
-        private $response_code = 200;
-
-        /**
-         * @inheritDoc
-         */
-        public function getContentType(): ?string
-        {
-            return "application/json";
-        }
-
-        /**
-         * @inheritDoc
-         * @noinspection PhpPureAttributeCanBeAddedInspection
-         */
-        public function getContentLength(): ?int
-        {
-            return strlen($this->response_content);
-        }
-
-        /**
-         * @inheritDoc
-         */
-        public function getBodyContent(): ?string
-        {
-            return $this->response_content;
-        }
-
-        /**
-         * @inheritDoc
-         */
-        public function getResponseCode(): ?int
-        {
-            return $this->response_code;
-        }
-
-        /**
-         * @inheritDoc
-         */
-        public function isFile(): ?bool
-        {
-            return false;
-        }
-
-        /**
-         * @inheritDoc
-         */
-        public function getFileName(): ?string
-        {
-            return null;
-        }
-
         /**
          * Process the quota for the subscription, returns false if the quota limit has been reached.
          *
@@ -231,7 +130,7 @@
          * @inheritDoc
          * @noinspection DuplicatedCode
          */
-        public function processRequest()
+        public function execute(): Response
         {
             $CoffeeHouse = new CoffeeHouse();
 
