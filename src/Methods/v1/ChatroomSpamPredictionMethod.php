@@ -28,6 +28,7 @@
     use IntellivoidAPI\Exceptions\AccessRecordNotFoundException;
     use IntellivoidAPI\Exceptions\InvalidRateLimitConfiguration;
     use IntellivoidAPI\IntellivoidAPI;
+    use IntellivoidAPI\Objects\AccessRecord;
     use KimchiAPI\Abstracts\Method;
     use KimchiAPI\Abstracts\ResponseStandard;
     use KimchiAPI\Classes\Request;
@@ -41,7 +42,10 @@
 
     class ChatroomSpamPredictionMethod extends Method
     {
-        private static $AccessRecord;
+        /**
+         * @var AccessRecord
+         */
+        private $AccessRecord;
 
         /**
          * Process the quota for the subscription, returns false if the quota limit has been reached.
@@ -53,14 +57,14 @@
             // Set the current quota if it doesn't SENTIMENT_CHECKS
             if(isset($this->access_record->Variables["SPAM_CHECKS"]) == false)
             {
-                self::$AccessRecord->setVariable("SPAM_CHECKS", 0);
+                $this->AccessRecord->setVariable("SPAM_CHECKS", 0);
             }
 
             // If the user has unlimited, ignore the check.
-            if((int)self::$AccessRecord->Variables["MAX_SPAM_CHECKS"] > 0)
+            if((int)$this->AccessRecord->Variables["MAX_SPAM_CHECKS"] > 0)
             {
                 // If the current sessions are equal or greater
-                if(self::$AccessRecord->Variables["SPAM_CHECKS"] >= self::$AccessRecord->Variables["MAX_SPAM_CHECKS"])
+                if($this->AccessRecord->Variables["SPAM_CHECKS"] >= $this->AccessRecord->Variables["MAX_SPAM_CHECKS"])
                 {
                     $Response = new Response();
                     $Response->Success = false;
@@ -254,14 +258,14 @@
                 KimchiAPI::handleResponse($Response);
             }
 
-            if($GeneralizationSize > (int)self::$AccessRecord->Variables["MAX_GENERALIZATION_SIZE"])
+            if($GeneralizationSize > (int)$this->AccessRecord->Variables["MAX_GENERALIZATION_SIZE"])
             {
 
                 $Response = new Response();
                 $Response->Success = false;
                 $Response->ResponseCode = 500;
                 $Response->ErrorCode = -1;
-                $Response->ErrorMessage = "You cannot exceed a generalization size of '" . self::$AccessRecord->Variables["MAX_GENERALIZATION_SIZE"] . "' (Subscription restriction)";
+                $Response->ErrorMessage = "You cannot exceed a generalization size of '" . $this->AccessRecord->Variables["MAX_GENERALIZATION_SIZE"] . "' (Subscription restriction)";
                 $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
                 KimchiAPI::handleResponse($Response);
@@ -285,14 +289,14 @@
         {
             $IntellivoidAPI = new IntellivoidAPI();
             $CoffeeHouse = new CoffeeHouse();
-            self::$AccessRecord = \Methods\Classes\Utilities::authenticateUser($IntellivoidAPI, ResponseStandard::IntellivoidAPI);
+            $this->AccessRecord = \Methods\Classes\Utilities::authenticateUser($IntellivoidAPI, ResponseStandard::IntellivoidAPI);
 
             // Import the check subscription script and execute it
             $SubscriptionValidation = new SubscriptionValidation();
 
             try
             {
-                $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $IntellivoidAPI, self::$AccessRecord);
+                $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $IntellivoidAPI, $this->AccessRecord);
             }
             catch (Exception $e)
             {
@@ -590,10 +594,10 @@
                KimchiAPI::handleException($e);
             }
 
-            self::$AccessRecord->Variables['SPAM_CHECKS'] += 1;
+            $this->AccessRecord->Variables['SPAM_CHECKS'] += 1;
             $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'chatroom_spam_checks', 0);
-            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'chatroom_spam_checks', self::$AccessRecord->ID);
-            $IntellivoidAPI->getAccessKeyManager()->updateAccessRecord(self::$AccessRecord);
+            $CoffeeHouse->getDeepAnalytics()->tally('coffeehouse_api', 'chatroom_spam_checks', $this->AccessRecord->ID);
+            $IntellivoidAPI->getAccessKeyManager()->updateAccessRecord($this->AccessRecord);
 
             return $Response;
         }
