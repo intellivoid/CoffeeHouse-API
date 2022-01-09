@@ -262,7 +262,7 @@
             {
                 $Response = new Response();
                 $Response->Success = false;
-                $Response->ResponseCode = 500;
+                $Response->ResponseCode = 400;
                 $Response->ErrorCode = -1;
                 $Response->ErrorMessage = "You cannot exceed a generalization size of '" . $this->AccessRecord->Variables["MAX_GENERALIZATION_SIZE"] . "' (Subscription restriction)";
                 $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
