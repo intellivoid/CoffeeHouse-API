@@ -55,7 +55,7 @@
         private function processQuota(): ?Response
         {
             // Set the current quota if it doesn't SENTIMENT_CHECKS
-            if(isset($this->access_record->Variables["SPAM_CHECKS"]) == false)
+            if(isset($this->AccessRecord->Variables["SPAM_CHECKS"]) == false)
             {
                 $this->AccessRecord->setVariable("SPAM_CHECKS", 0);
             }
@@ -88,7 +88,7 @@
          */
         private function validateNlpInput(string $input): ?Response
         {
-            if(isset($this->access_record->Variables["MAX_NLP_CHARACTERS"]) == false)
+            if(isset($this->AccessRecord->Variables["MAX_NLP_CHARACTERS"]) == false)
             {
                 $Response = new Response();
                 $Response->Success = false;
@@ -100,13 +100,13 @@
                 return $Response;
             }
 
-            if(strlen($input) > (int)$this->access_record->Variables["MAX_NLP_CHARACTERS"])
+            if(strlen($input) > (int)$this->AccessRecord->Variables["MAX_NLP_CHARACTERS"])
             {
                 $Response = new Response();
                 $Response->Success = false;
                 $Response->ResponseCode = 400;
                 $Response->ErrorCode = 21;
-                $Response->ErrorMessage = "The given input exceeds the limit of '" . $this->access_record->Variables["MAX_NLP_CHARACTERS"] . "' characters. (Subscription restriction)";
+                $Response->ErrorMessage = "The given input exceeds the limit of '" . $this->AccessRecord->Variables["MAX_NLP_CHARACTERS"] . "' characters. (Subscription restriction)";
                 $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
                 return $Response;
@@ -246,7 +246,7 @@
             }
 
             // Set the current quota if it doesn't exist
-            if(isset($this->access_record->Variables["MAX_GENERALIZATION_SIZE"]) == false)
+            if(isset($this->AccessRecord->Variables["MAX_GENERALIZATION_SIZE"]) == false)
             {
                 $Response = new Response();
                 $Response->Success = false;

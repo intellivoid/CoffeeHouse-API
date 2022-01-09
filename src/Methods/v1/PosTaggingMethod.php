@@ -20,167 +20,159 @@
     use CoffeeHouse\Exceptions\InvalidLanguageException;
     use CoffeeHouse\Exceptions\InvalidTextInputException;
     use Exception;
+    use IntellivoidAPI\Exceptions\AccessRecordNotFoundException;
+    use IntellivoidAPI\Exceptions\DatabaseException;
+    use IntellivoidAPI\Exceptions\InvalidRateLimitConfiguration;
+    use IntellivoidAPI\Exceptions\InvalidSearchMethodException;
+    use IntellivoidAPI\IntellivoidAPI;
+    use IntellivoidAPI\Objects\AccessRecord;
     use KimchiAPI\Abstracts\Method;
+    use KimchiAPI\Abstracts\ResponseStandard;
+    use KimchiAPI\Classes\Request;
+    use KimchiAPI\Exceptions\AccessKeyNotProvidedException;
+    use KimchiAPI\Exceptions\ApiException;
+    use KimchiAPI\Exceptions\UnsupportedResponseStandardException;
+    use KimchiAPI\Exceptions\UnsupportedResponseTypeExceptions;
+    use KimchiAPI\KimchiAPI;
     use KimchiAPI\Objects\Response;
-    use SubscriptionValidation;
+    use Methods\Classes\SubscriptionValidation;
 
     class PosTaggingMethod extends Method
     {
         /**
+         * @var AccessRecord
+         */
+        private $AccessRecord;
+
+        /**
          * Process the quota for the subscription, returns false if the quota limit has been reached.
          *
-         * @return bool
+         * @return Response|null
          */
-        private function processQuota(): bool
+        private function processQuota(): ?Response
         {
             // Set the current quota if it doesn't exist
-            if(isset($this->access_record->Variables["POS_CHECKS"]) == false)
+            if(isset($this->AccessRecord->Variables["POS_CHECKS"]) == false)
             {
-                $this->access_record->setVariable("POS_CHECKS", 0);
+                $this->AccessRecord->setVariable("POS_CHECKS", 0);
             }
 
             // If the user has unlimited, ignore the check.
-            if((int)$this->access_record->Variables["MAX_POS_CHECKS"] > 0)
+            if((int)$this->AccessRecord->Variables["MAX_POS_CHECKS"] > 0)
             {
                 // If the current sessions are equal or greater
-                if($this->access_record->Variables["POS_CHECKS"] >= $this->access_record->Variables["MAX_POS_CHECKS"])
+                if($this->AccessRecord->Variables["POS_CHECKS"] >= $this->AccessRecord->Variables["MAX_POS_CHECKS"])
                 {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 429,
-                        "error" => array(
-                            "error_code" => 6,
-                            "type" => "CLIENT",
-                            "message" => "You have reached the max quota for this method"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
-
-                    return False;
+                    $Response = new Response();
+                    $Response->Success = false;
+                    $Response->ResponseCode = 429;
+                    $Response->ErrorCode = 6;
+                    $Response->ErrorMessage = 'You have reached the max quota for this method';
+                    $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                    return $Response;
                 }
             }
 
-            return True;
+            return null;
         }
 
         /**
          * Validates if the input is applicable to the NLP method
          *
          * @param string $input
-         * @return bool
+         * @return Response|null
+         * @noinspection DuplicatedCode
          */
-        private function validateNlpInput(string $input): bool
+        private function validateNlpInput(string $input): ?Response
         {
-            if(isset($this->access_record->Variables["MAX_NLP_CHARACTERS"]) == false)
+            if(isset($this->AccessRecord->Variables["MAX_NLP_CHARACTERS"]) == false)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 500,
-                    "error" => array(
-                        "error_code" => -1,
-                        "type" => "SERVER",
-                        "message" => "The server cannot verify the value 'MAX_NLP_CHARACTERS'"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 500;
+                $Response->ErrorCode = -1;
+                $Response->ErrorMessage = "The server cannot verify the value 'MAX_NLP_CHARACTERS'";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                return False;
+                return $Response;
             }
 
-            if(strlen($input) > (int)$this->access_record->Variables["MAX_NLP_CHARACTERS"])
+            if(strlen($input) > (int)$this->AccessRecord->Variables["MAX_NLP_CHARACTERS"])
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 21,
-                        "type" => "CLIENT",
-                        "message" => "The given input exceeds the limit of '" . $this->access_record->Variables["MAX_NLP_CHARACTERS"] . "' characters. (Subscription restriction)"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 21;
+                $Response->ErrorMessage = "The given input exceeds the limit of '" . $this->AccessRecord->Variables["MAX_NLP_CHARACTERS"] . "' characters. (Subscription restriction)";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                return False;
+                return $Response;
             }
 
             if(strlen($input) == 0)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 22,
-                        "type" => "CLIENT",
-                        "message" => "The given input cannot be empty"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 22;
+                $Response->ErrorMessage = "The given input cannot be empty";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                return False;
+                return $Response;
             }
 
-            return True;
+            return null;
         }
 
         /**
-         * @inheritDoc
+         * @return Response
+         * @throws AccessKeyNotProvidedException
+         * @throws ApiException
+         * @throws UnsupportedResponseStandardException
+         * @throws UnsupportedResponseTypeExceptions
+         * @throws AccessRecordNotFoundException
+         * @throws DatabaseException
+         * @throws InvalidRateLimitConfiguration
+         * @throws InvalidSearchMethodException
          * @noinspection DuplicatedCode
          */
         public function execute(): Response
         {
+            $IntellivoidAPI = new IntellivoidAPI();
             $CoffeeHouse = new CoffeeHouse();
-
-            // Import the check subscription script and execute it
+            $this->AccessRecord = \Methods\Classes\Utilities::authenticateUser($IntellivoidAPI, ResponseStandard::IntellivoidAPI);
             $SubscriptionValidation = new SubscriptionValidation();
 
             try
             {
-                $ValidationResponse = $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $this->access_record);
+                $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $IntellivoidAPI, $this->AccessRecord);
             }
             catch (Exception $e)
             {
-                InternalServerError::executeResponse($e);
-                exit();
+                KimchiAPI::handleException($e);
             }
 
-            if(is_null($ValidationResponse) == false)
-            {
-                $this->response_content = json_encode($ValidationResponse["response"]);
-                $this->response_code = $ValidationResponse["response_code"];
+            $process_quota_results = $this->processQuota();
+            if($process_quota_results !== null)
+                return $process_quota_results;
 
-                return null;
-            }
-
-            if($this->processQuota() == false)
-            {
-                return null;
-            }
-
-            $Parameters = Handler::getParameters(true, true);
+            $Parameters = Request::getParameters();
 
             if(isset($Parameters["input"]) == false)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 20,
-                        "type" => "CLIENT",
-                        "message" => "Missing parameter 'input'"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 20;
+                $Response->ErrorMessage = "Missing parameter 'input'";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                return false;
+                return $Response;
             }
 
-            if($this->validateNlpInput($Parameters["input"]) == false)
-                return false;
+            $validateNlpInputResults = $this->validateNlpInput($Parameters['input']);
+            if($validateNlpInputResults !== null)
+                return $validateNlpInputResults;
 
             $source_language = "en";
 
@@ -196,35 +188,27 @@
                     }
                     catch (CoffeeHouseUtilsNotReadyException $e)
                     {
-                        $ResponsePayload = array(
-                            "success" => false,
-                            "response_code" => 503,
-                            "error" => array(
-                                "error_code" => 13,
-                                "type" => "SERVER",
-                                "message" => "CoffeeHouse-Utils is temporarily unavailable"
-                            )
-                        );
-                        $this->response_content = json_encode($ResponsePayload);
-                        $this->response_code = (int)$ResponsePayload["response_code"];
+                        $Response = new Response();
+                        $Response->Success = false;
+                        $Response->ResponseCode = 503;
+                        $Response->ErrorCode = 13;
+                        $Response->ErrorMessage = 'CoffeeHouse is temporary unavailable';
+                        $Response->Exception = $e;
+                        $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                        return false;
+                        return $Response;
                     }
                     catch(Exception $e)
                     {
-                        $ResponsePayload = array(
-                            "success" => false,
-                            "response_code" => 500,
-                            "error" => array(
-                                "error_code" => -1,
-                                "type" => "SERVER",
-                                "message" => "There was an error while trying to auto-detect the language"
-                            )
-                        );
-                        $this->response_content = json_encode($ResponsePayload);
-                        $this->response_code = (int)$ResponsePayload["response_code"];
+                        $Response = new Response();
+                        $Response->Success = false;
+                        $Response->ResponseCode = 500;
+                        $Response->ErrorCode = -1;
+                        $Response->ErrorMessage =  'There was an error while trying to auto-detect the language';
+                        $Response->Exception = $e;
+                        $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                        return false;
+                        return $Response;
                     }
                 }
 
@@ -234,37 +218,28 @@
                 }
                 catch (InvalidLanguageException $e)
                 {
-                    $ResponsePayload = array(
-                        "success" => false,
-                        "response_code" => 400,
-                        "error" => array(
-                            "error_code" => 7,
-                            "type" => "CLIENT",
-                            "message" => "The given language '" . $Parameters["language"] . "' cannot be identified"
-                        )
-                    );
-                    $this->response_content = json_encode($ResponsePayload);
-                    $this->response_code = (int)$ResponsePayload["response_code"];
+                    $Response = new Response();
+                    $Response->Success = false;
+                    $Response->ResponseCode = 400;
+                    $Response->ErrorCode = 7;
+                    $Response->ErrorMessage = 'The given language ' . $Parameters['language'] . ' cannot be identified';
+                    $Response->Exception = $e;
+                    $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                    return false;
+                    return $Response;
                 }
             }
 
-            if(in_array($source_language, get_supported_languages()) == false)
+            if(in_array($source_language, \Methods\Classes\Utilities::getSupportedLanguages()) == false)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 23,
-                        "type" => "CLIENT",
-                        "message" => "The given language '$source_language' is not supported"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 400;
+                $Response->ErrorCode = 23;
+                $Response->ErrorMessage = "The given language '$source_language' is not supported";
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                return false;
+                return $Response;
             }
 
             try
@@ -273,51 +248,37 @@
             }
             catch (CoffeeHouseUtilsNotReadyException $e)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 503,
-                    "error" => array(
-                        "error_code" => 13,
-                        "type" => "SERVER",
-                        "message" => "CoffeeHouse-Utils is temporarily unavailable"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 503;
+                $Response->ErrorCode = 13;
+                $Response->ErrorMessage = 'CoffeeHouse is temporary unavailable';
+                $Response->Exception = $e;
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
 
-                return false;
+                return $Response;
             }
             catch (InvalidInputException | InvalidTextInputException | InvalidLanguageException $e)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 400,
-                    "error" => array(
-                        "error_code" => 24,
-                        "type" => "CLIENT",
-                        "message" => "The given input cannot be processed"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                return false;
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 500;
+                $Response->ErrorCode = 24;
+                $Response->ErrorMessage = 'The given input cannot be processed';
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                $Response->Exception = $e;
+                return $Response;
             }
             catch(Exception $e)
             {
-                $ResponsePayload = array(
-                    "success" => false,
-                    "response_code" => 500,
-                    "error" => array(
-                        "error_code" => -1,
-                        "type" => "SERVER",
-                        "message" => "There was an unexpected error while trying to process your input"
-                    )
-                );
-                $this->response_content = json_encode($ResponsePayload);
-                $this->response_code = (int)$ResponsePayload["response_code"];
-
-                return false;
+                $Response = new Response();
+                $Response->Success = false;
+                $Response->ResponseCode = 500;
+                $Response->ErrorCode = -1;
+                $Response->ErrorMessage = 'There was an unexpected error while trying to process your input';
+                $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;
+                $Response->Exception = $e;
+                return $Response;
             }
 
             $SentencesResults = [];
@@ -356,38 +317,32 @@
                 ];
             }
 
+            $Response = new Response();
+            $Response->Success = true;
+            $Response->ResponseCode = 200;
+
             if($SentenceSplit)
             {
-                $ResponsePayload = array(
-                    "success" => true,
-                    "response_code" => 200,
-                    "results" => [
-                        "text" => $PosTagsResults->Text,
-                        "source_language" => $source_language,
-                        "sentences" => $SentencesResults
-                    ]
-                );
+                $Response->ResultData = [
+                    "text" => $PosTagsResults->Text,
+                    "source_language" => $source_language,
+                    "sentences" => $SentencesResults
+                ];
             }
             else
             {
-                $ResponsePayload = array(
-                    "success" => true,
-                    "response_code" => 200,
-                    "results" => [
-                        "text" => $PosTagsResults->Text,
-                        "source_language" => $source_language,
-                        "tags" => $TokenResults
-                    ]
-                );
+                $Response->ResultData = [
+                    "text" => $PosTagsResults->Text,
+                    "source_language" => $source_language,
+                    "tags" => $TokenResults
+                ];
             }
 
-            $this->response_content = json_encode($ResponsePayload);
-            $this->response_code = (int)$ResponsePayload["response_code"];
-
-            $this->access_record->Variables["POS_CHECKS"] += 1;
+            $this->AccessRecord->Variables["POS_CHECKS"] += 1;
             $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "pos_checks", 0);
-            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "pos_checks", $this->access_record->ID);
+            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "pos_checks", $this->AccessRecord->ID);
+            $IntellivoidAPI->getAccessKeyManager()->updateAccessRecord($this->AccessRecord);
 
-            return true;
+            return $Response;
         }
     }

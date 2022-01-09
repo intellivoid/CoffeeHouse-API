@@ -402,7 +402,7 @@
             {
                 $Response = new Response();
                 $Response->Success = false;
-                $Response->ResponseCode = 400;
+                $Response->ResponseCode = 500;
                 $Response->ErrorCode = 24;
                 $Response->ErrorMessage = 'The given input cannot be processed';
                 $Response->ResponseStandard = ResponseStandard::IntellivoidAPI;

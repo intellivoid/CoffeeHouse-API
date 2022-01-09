@@ -34,16 +34,16 @@
         private function processQuota(): bool
         {
             // Set the current quota if it doesn't exist
-            if(isset($this->access_record->Variables["SENTENCE_SPLITS"]) == false)
+            if(isset($this->AccessRecord->Variables["SENTENCE_SPLITS"]) == false)
             {
-                $this->access_record->setVariable("SENTENCE_SPLITS", 0);
+                $this->AccessRecord->setVariable("SENTENCE_SPLITS", 0);
             }
 
             // If the user has unlimited, ignore the check.
-            if((int)$this->access_record->Variables["MAX_SENTENCE_SPLITS"] > 0)
+            if((int)$this->AccessRecord->Variables["MAX_SENTENCE_SPLITS"] > 0)
             {
                 // If the current sessions are equal or greater
-                if($this->access_record->Variables["SENTENCE_SPLITS"] >= $this->access_record->Variables["MAX_SENTENCE_SPLITS"])
+                if($this->AccessRecord->Variables["SENTENCE_SPLITS"] >= $this->AccessRecord->Variables["MAX_SENTENCE_SPLITS"])
                 {
                     $ResponsePayload = array(
                         "success" => false,
@@ -72,7 +72,7 @@
          */
         private function validateNlpInput(string $input): bool
         {
-            if(isset($this->access_record->Variables["MAX_NLP_CHARACTERS"]) == false)
+            if(isset($this->AccessRecord->Variables["MAX_NLP_CHARACTERS"]) == false)
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -89,7 +89,7 @@
                 return False;
             }
 
-            if(strlen($input) > (int)$this->access_record->Variables["MAX_NLP_CHARACTERS"])
+            if(strlen($input) > (int)$this->AccessRecord->Variables["MAX_NLP_CHARACTERS"])
             {
                 $ResponsePayload = array(
                     "success" => false,
@@ -97,7 +97,7 @@
                     "error" => array(
                         "error_code" => 21,
                         "type" => "CLIENT",
-                        "message" => "The given input exceeds the limit of '" . $this->access_record->Variables["MAX_NLP_CHARACTERS"] . "' characters. (Subscription restriction)"
+                        "message" => "The given input exceeds the limit of '" . $this->AccessRecord->Variables["MAX_NLP_CHARACTERS"] . "' characters. (Subscription restriction)"
                     )
                 );
                 $this->response_content = json_encode($ResponsePayload);
@@ -139,7 +139,7 @@
 
             try
             {
-                $ValidationResponse = $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $this->access_record);
+                $ValidationResponse = $SubscriptionValidation->validateUserSubscription($CoffeeHouse, $this->AccessRecord);
             }
             catch (Exception $e)
             {
@@ -260,9 +260,9 @@
             $this->response_content = json_encode($ResponsePayload);
             $this->response_code = (int)$ResponsePayload["response_code"];
 
-            $this->access_record->Variables["SENTENCE_SPLITS"] += 1;
+            $this->AccessRecord->Variables["SENTENCE_SPLITS"] += 1;
             $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "sentence_splits", 0);
-            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "sentence_splits", $this->access_record->ID);
+            $CoffeeHouse->getDeepAnalytics()->tally("coffeehouse_api", "sentence_splits", $this->AccessRecord->ID);
 
             return true;
         }
